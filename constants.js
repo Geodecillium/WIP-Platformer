@@ -1,0 +1,3 @@
+const GAME_HEIGHT = 1000,
+  GAME_WIDTH = 800,
+  BLOCK_SIZE = 25
