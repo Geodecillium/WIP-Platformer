@@ -31,6 +31,22 @@ class Map {
             fill(128);
             rect(j, i, BLOCK_SIZE, BLOCK_SIZE);
             break;
+          case 2: //up spike
+            fill(255, 0, 0);
+            triangle(j, i + BLOCK_SIZE, j + BLOCK_SIZE / 2, i, j + BLOCK_SIZE, i + BLOCK_SIZE);
+            break;
+          case 3: //right spike
+            fill(255, 0, 0);
+            triangle(j, i, j + BLOCK_SIZE, i + BLOCK_SIZE / 2, j, i + BLOCK_SIZE);
+            break;
+          case 4: //down spike
+            fill(255, 0, 0);
+            triangle(j, i, j + BLOCK_SIZE / 2, i + BLOCK_SIZE, j + BLOCK_SIZE, i);
+            break;
+          case 5: //left spike
+            fill(255, 0, 0);
+            triangle(j + BLOCK_SIZE, i, j, i + BLOCK_SIZE / 2, j + BLOCK_SIZE, i + BLOCK_SIZE);
+            break;
         }
       }
     }
