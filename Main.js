@@ -16,6 +16,7 @@ function setup() {
 
   player = new Player();
   map = new Map("temp", "start");
+  gamestate = GAME_PLAYING;
 }
 
 function draw() {

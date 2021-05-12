@@ -3,7 +3,7 @@ class Map {
     this.camera = {
       x: 0,
       y: 0
-    };
+    }
     this.objects = [];
     this.loadLevel(startLevel, startEntrance);
   }
@@ -29,7 +29,7 @@ class Map {
           case EMPTY:
             break;
           case WALL:
-            this.objects.push(new Wall(j * BLOCK_SIZE, i * BLOCK_SIZE));
+            this.objects.push(new Wall(j, i));
             break;
           case UP_SPIKE:
             this.objects.push(new Spike(j * BLOCK_SIZE, i * BLOCK_SIZE, UP));

@@ -1,12 +1,16 @@
 class Player {
   constructor() {
-    this.state = PLAYER_IDLE;
-    this.direction = RIGHT;
+    this.state = {
+      animation: PLAYER_IDLE,
+      walk: PLAYER_STILL,
+      fall: PLAYER_GROUNDED,
+      direction: RIGHT
+    }
     this.height = 50;
     this.width = 25;
     this.acc = {
       x: 0,
-      y: 3
+      y: 0
     }
     this.vel = {
       x: 0,
@@ -24,10 +28,9 @@ class Player {
 
   enter(entrance) {
     //reset player
-    this.state = PLAYER_IDLE;
     this.direction = RIGHT;
     this.acc.x = 0;
-    this.acc.y = 3;
+    this.acc.y = 0;
     this.vel.x = 0;
     this.vel.y = 0;
     this.pos.x = entrance.x;
@@ -41,9 +44,28 @@ class Player {
       x: this.pos.x,
       y: this.pos.y
     }
+    switch (player.state.fall) {
+      case PLAYER_GROUNDED:
+        this.acc.y = 0;
+        break;
+      case PLAYER_FALL:
+        this.acc.y = GRAVITY;
+        if (this.vel.y > MAX_FALL_SPEED) {
+          this.vel.y = MAX_FALL_SPEED;
+        }
+        break;
+      case PLAYER_FAST_FALL:
+        this.acc.y = GRAVITY;
+        if (this.vel.y > MAX_FAST_FALL_SPEED) {
+          this.vel.y = MAX_FAST_FALL_SPEED;
+        }
+        break;
+      case JUMP:
+        this.vel.y = JUMP_SPEED
+        break;
+    }
     this.vel.x += this.acc.x;
     this.vel.y += this.acc.y;
-    if (this.vel.y > 25) this.vel.y = 50
     this.pos.x += this.vel.x;
     this.pos.y += this.vel.y;
 

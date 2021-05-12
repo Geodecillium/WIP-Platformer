@@ -11,15 +11,29 @@ const
   DOWN_SPIKE = 4,
   LEFT_SPIKE = 5,
   //game states
+  GAME_PLAYING = 0,
   GAME_MENU = 1,
   GAME_PAUSED = 2,
   GAME_FROZEN = 3,
+  GAME_DEAD = 4,
   //player states
+  //  animation
   PLAYER_IDLE = 1,
+  //  walk
+  PLAYER_STILL = 1,
   PLAYER_WALK_ACC = 2,
   PLAYER_WALK = 3,
   PLAYER_WALK_DEC = 4,
-  PLAYER_JUMP = 5,
+  //  fall
+  PLAYER_GROUNDED = 1,
+  PLAYER_FALL = 2,
+  PLAYER_FAST_FALL = 3,
+  PLAYER_JUMP = 4,
+  //player math
+  GRAVITY = 3,
+  MAX_FALL_SPEED = 12, //3 less than actually max fall speed due to acceleration being applied after
+  MAX_FAST_FALL_SPEED = 17,
+  JUMP_SPEED = 25,
   //general movement
   UP = 1,
   UP_RIGHT = 2,
