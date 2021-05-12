@@ -1,5 +1,6 @@
 class Spike {
   constructor(x, y, direction) {
+    this.width = this.height = BLOCK_SIZE;
     this.direction = direction;
     this.pos = {
       x: x,

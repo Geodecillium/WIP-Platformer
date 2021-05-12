@@ -19,9 +19,8 @@ class Map {
   loadLevel(level, entrance) {
     this.levelName = level;
     this.level = levelList[level];
-    let blocks = this.level.map
-    this.objects = []
-    console.log(this.level.entrances[entrance])
+    let blocks = this.level.map;
+    this.objects = [];
     player.enter(this.level.entrances[entrance]);
     for (let i = 0; i < blocks.length; i++) {
       for (let j = 0; j < blocks[i].length; j++) {
@@ -30,19 +29,19 @@ class Map {
           case EMPTY:
             break;
           case WALL:
-            this.objects.push(new Wall(j * BLOCK_SIZE, i * BLOCK_SIZE))
+            this.objects.push(new Wall(j * BLOCK_SIZE, i * BLOCK_SIZE));
             break;
           case UP_SPIKE:
-            this.objects.push(new Spike(j* BLOCK_SIZE, i * BLOCK_SIZE, UP))
+            this.objects.push(new Spike(j * BLOCK_SIZE, i * BLOCK_SIZE, UP));
             break;
           case RIGHT_SPIKE:
-            this.objects.push(new Spike(j* BLOCK_SIZE, i * BLOCK_SIZE, RIGHT))
+            this.objects.push(new Spike(j * BLOCK_SIZE, i * BLOCK_SIZE, RIGHT));
             break;
           case DOWN_SPIKE:
-            this.objects.push(new Spike(j* BLOCK_SIZE, i * BLOCK_SIZE, DOWN))
+            this.objects.push(new Spike(j * BLOCK_SIZE, i * BLOCK_SIZE, DOWN));
             break;
           case LEFT_SPIKE:
-            this.objects.push(new Spike(j* BLOCK_SIZE, i * BLOCK_SIZE, LEFT))
+            this.objects.push(new Spike(j * BLOCK_SIZE, i * BLOCK_SIZE, LEFT));
             break;
         }
       }

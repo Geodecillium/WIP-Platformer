@@ -12,8 +12,8 @@ const
   LEFT_SPIKE = 5,
   //game states
   GAME_MENU = 1,
-  GAME_PAUSED=2,
-  GAME_FROZEN=3,
+  GAME_PAUSED = 2,
+  GAME_FROZEN = 3,
   //player states
   PLAYER_IDLE = 1,
   PLAYER_WALK_ACC = 2,
