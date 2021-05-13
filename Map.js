@@ -21,7 +21,7 @@ class Map {
     this.level = levelList[level];
     let blocks = this.level.map;
     this.objects = [];
-    player.enter(this.level.entrances[entrance]);
+    player.spawn(this.level.entrances[entrance]);
     for (let i = 0; i < blocks.length; i++) {
       for (let j = 0; j < blocks[i].length; j++) {
         let blockStyle = blocks[i][j];

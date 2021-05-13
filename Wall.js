@@ -14,7 +14,7 @@ class Wall {
   checkCollision(object, prevPos, name) {
     switch (name) {
       case 'player':
-        if (prevPos.y + object.height <= this.pos.y && object.pos.y + object.height > this.pos.y && !((prevPos.x + object.width == this.pos.x || prevPos.x == this.pos.x + this.width) && (map.level.map[this.id.i][this.id.j - 1] == 1 || map.level.map[this.id.x][this.id.y - 2] == 1)) && intersect(prevPos.x, prevPos.y + object.height, object.pos.x, object.pos.y + object.height, this.pos.x - object.width, this.pos.y, this.pos.x + this.width, this.pos.y)) {
+        if (prevPos.y + object.height <= this.pos.y && object.pos.y + object.height > this.pos.y && !((prevPos.x + object.width == this.pos.x || prevPos.x == this.pos.x + this.width) && (map.level.map[this.id.i][this.id.j - 1] == 1 || map.level.map[this.id.i][this.id.j - 2] == 1)) && intersect(prevPos.x, prevPos.y + object.height, object.pos.x, object.pos.y + object.height, this.pos.x - object.width, this.pos.y, this.pos.x + this.width, this.pos.y)) {
           object.pos.y = this.pos.y - object.height;
           object.vel.y = 0;
         } else if (prevPos.y >= this.pos.y + this.height && object.pos.y < this.pos.y + this.height && prevPos.x + object.width != this.pos.x && prevPos.x != this.pos.x + this.width && intersect(prevPos.x, prevPos.y, object.pos.x, object.pos.y, this.pos.x - object.width, this.pos.y + this.height, this.pos.x + this.width, this.pos.y + this.height)) {

@@ -26,7 +26,7 @@ class Player {
     }
   }
 
-  enter(entrance) {
+  spawn(entrance) {
     //reset player
     this.direction = RIGHT;
     this.acc.x = 0;
@@ -40,28 +40,49 @@ class Player {
   }
 
   update() {
+    if (gamestate == GAME_DEAD) {
+      this.spawn(this.respawn);
+      return;
+    }
     let prev = {
       x: this.pos.x,
       y: this.pos.y
     }
-    switch (player.state.fall) {
+    let onGround = map.level.map[this.pos.y / BLOCK_SIZE + 2]?.[floor(this.pos.x / BLOCK_SIZE)] == 1 || map.level.map[this.pos.y / BLOCK_SIZE + 2]?.[ceil(this.pos.x / BLOCK_SIZE)] == 1
+    switch (this.state.fall) {
       case PLAYER_GROUNDED:
-        this.acc.y = 0;
+        if (onGround) {
+          this.acc.y = 0;
+        } else {
+          this.state.fall = PLAYER_FALL;
+        }
         break;
       case PLAYER_FALL:
-        this.acc.y = GRAVITY;
-        if (this.vel.y > MAX_FALL_SPEED) {
-          this.vel.y = MAX_FALL_SPEED;
+        if (onGround) {
+          this.state.fall = PLAYER_GROUNDED;
+        } else {
+          this.acc.y = GRAVITY;
+          if (this.vel.y > MAX_FALL_SPEED) {
+            this.vel.y = MAX_FALL_SPEED;
+          }
         }
         break;
       case PLAYER_FAST_FALL:
-        this.acc.y = GRAVITY;
-        if (this.vel.y > MAX_FAST_FALL_SPEED) {
-          this.vel.y = MAX_FAST_FALL_SPEED;
+        if (onGround) {
+          this.state.fall = PLAYER_GROUNDED;
+        } else {
+          this.acc.y = GRAVITY;
+          if (this.vel.y > MAX_FAST_FALL_SPEED) {
+            this.vel.y = MAX_FAST_FALL_SPEED;
+          }
         }
         break;
-      case JUMP:
-        this.vel.y = JUMP_SPEED
+      case PLAYER_JUMP:
+        if (onGround) {
+          this.vel.y = JUMP_SPEED;
+        } else {
+          this.state.fall = PLAYER_FALL;
+        }
         break;
     }
     this.vel.x += this.acc.x;
@@ -71,6 +92,7 @@ class Player {
 
     for (let object of map.objects) {
       object.checkCollision?.(this, prev, 'player');
+      if (gamestate == GAME_DEAD) break;
     }
   }
 

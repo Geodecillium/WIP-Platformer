@@ -7,62 +7,95 @@ class Spike {
       y: y
     }
     this.vertices = [];
+    this.hitbox = [];
     switch (direction) {
       case UP:
-        this.vertices[0] = {
+        this.vertices = [{
           x: x,
           y: y + this.height
-        }
-        this.vertices[1] = {
+        }, {
           x: x + this.width / 2,
           y: y
-        }
-        this.vertices[2] = {
+        }, {
           x: x + this.width,
           y: y + this.height
-        }
+        }]
+        this.hitbox = [{
+          x: x + 2.55,
+          y: y + this.height - 1.58
+        }, {
+          x: x + this.width / 2,
+          y: y + 3
+        }, {
+          x: x + this.width - 2.55,
+          y: y + this.height - 1.58
+        }]
         break;
       case RIGHT:
-        this.vertices[0] = {
+        this.vertices = [{
           x: x,
           y: y
-        }
-        this.vertices[1] = {
+        }, {
           x: x + this.width,
           y: y + this.height / 2
-        }
-        this.vertices[2] = {
+        }, {
           x: x,
           y: y + this.height
-        }
+        }]
+        this.hitbox = [{
+          x: x + 1.58,
+          y: y + 2.55
+        }, {
+          x: x + this.width - 3,
+          y: y + this.height / 2
+        }, {
+          x: x + 1.58,
+          y: y + this.height - 2.55
+        }]
         break;
       case DOWN:
-        this.vertices[0] = {
+        this.vertices = [{
           x: x,
           y: y
-        }
-        this.vertices[1] = {
+        }, {
           x: x + this.width / 2,
           y: y + this.height
-        }
-        this.vertices[2] = {
+        }, {
           x: x + this.width,
           y: y
-        }
+        }]
+        this.hitbox = [{
+          x: x + 2.55,
+          y: y + 1.58
+        }, {
+          x: x + this.width / 2,
+          y: y + this.height - 3
+        }, {
+          x: x + this.width - 2.55,
+          y: y + 1.58
+        }]
         break;
       case LEFT:
-        this.vertices[0] = {
+        this.vertices = [{
           x: x + this.width,
           y: y
-        }
-        this.vertices[1] = {
+        }, {
           x: x,
           y: y + this.height / 2
-        }
-        this.vertices[2] = {
+        }, {
           x: x + this.width,
           y: y + this.height
-        }
+        }]
+        this.hitbox = [{
+          x: x + this.width - 1.58,
+          y: y + 2.55
+        }, {
+          x: x + 3,
+          y: y + this.height / 2
+        }, {
+          x: x + this.width - 1.58,
+          y: y + this.height - 2.55
+        }]
         break;
     }
   }
@@ -98,10 +131,9 @@ class Spike {
         ]
         for (let edge of edges) {
           for (let i in this.vertices) {
-            if (intersect(edge.x1, edge.y1, edge.x2, edge.y2, this.vertices[i].x, this.vertices[i].y, this.vertices[(i+1)%3])) {
+            if (intersect(edge.x1, edge.y1, edge.x2, edge.y2, this.hitbox[i].x, this.hitbox[i].y, this.hitbox[(i - -1) % 3].x, this.hitbox[(i - -1) % 3].y)) {
               gamestate = GAME_DEAD;
-              console.log('dead')
-              break;
+              return;
             }
           }
         }
@@ -111,6 +143,6 @@ class Spike {
 
   draw() {
     fill(255, 0, 0);
-    triangle(this.vertices[0]?.x, this.vertices[0]?.y, this.vertices[1]?.x, this.vertices[1]?.y, this.vertices[2]?.x, this.vertices[2]?.y);
+    triangle(this.vertices[0].x, this.vertices[0].y, this.vertices[1].x, this.vertices[1].y, this.vertices[2].x, this.vertices[2].y);
   }
 }
