@@ -4,9 +4,12 @@ let map;
 let player;
 let levelList;
 let gamestate;
+let music = {};
 
 function preload() {
   levelList = loadJSON("levelList.json");
+  soundFormats("m4a");
+  music.main = loadSound("Main theme.m4a");
 }
 
 function setup() {
@@ -14,6 +17,7 @@ function setup() {
   noStroke();
   frameRate(30);
 
+  music.main.loop();
   player = new Player();
   map = new Map("temp", "start");
   gamestate = GAME_PLAYING;
