@@ -48,7 +48,7 @@ class Player {
       x: this.pos.x,
       y: this.pos.y
     }
-    let onGround = map.level.map[this.pos.y / BLOCK_SIZE + 2]?.[floor(this.pos.x / BLOCK_SIZE)] == 1 || map.level.map[this.pos.y / BLOCK_SIZE + 2]?.[ceil(this.pos.x / BLOCK_SIZE)] == 1
+    let onGround = map.level.map[floor(this.pos.x / BLOCK_SIZE)]?.[this.pos.y / BLOCK_SIZE + 2] === 1 || map.level.map[ceil(this.pos.x / BLOCK_SIZE)]?.[this.pos.y / BLOCK_SIZE + 2] === 1;
     switch (this.state.fall) {
       case PLAYER_GROUNDED:
         if (onGround) {

@@ -2,8 +2,8 @@ class Wall {
   constructor(x, y) {
     this.width = this.height = BLOCK_SIZE;
     this.id = {
-      i: y,
-      j: x
+      i: x,
+      j: y
     }
     this.pos = {
       x: x * BLOCK_SIZE,

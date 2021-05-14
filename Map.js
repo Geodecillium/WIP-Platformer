@@ -29,19 +29,19 @@ class Map {
           case EMPTY:
             break;
           case WALL:
-            this.objects.push(new Wall(j, i));
+            this.objects.push(new Wall(i, j));
             break;
           case UP_SPIKE:
-            this.objects.push(new Spike(j * BLOCK_SIZE, i * BLOCK_SIZE, UP));
+            this.objects.push(new Spike(i * BLOCK_SIZE, j * BLOCK_SIZE, UP));
             break;
           case RIGHT_SPIKE:
-            this.objects.push(new Spike(j * BLOCK_SIZE, i * BLOCK_SIZE, RIGHT));
+            this.objects.push(new Spike(i * BLOCK_SIZE, j * BLOCK_SIZE, RIGHT));
             break;
           case DOWN_SPIKE:
-            this.objects.push(new Spike(j * BLOCK_SIZE, i * BLOCK_SIZE, DOWN));
+            this.objects.push(new Spike(i * BLOCK_SIZE, j * BLOCK_SIZE, DOWN));
             break;
           case LEFT_SPIKE:
-            this.objects.push(new Spike(j * BLOCK_SIZE, i * BLOCK_SIZE, LEFT));
+            this.objects.push(new Spike(i * BLOCK_SIZE, j * BLOCK_SIZE, LEFT));
             break;
         }
       }
