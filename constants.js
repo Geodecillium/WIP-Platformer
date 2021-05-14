@@ -29,11 +29,13 @@ const
   PLAYER_FALL = 2,
   PLAYER_FAST_FALL = 3,
   PLAYER_JUMP = 4,
+  PLAYER_CANCEL_JUMP = 5,
+  PLAYER_HANG = 6,
   //player math
   GRAVITY = 3,
   MAX_FALL_SPEED = 12, //3 less than actually max fall speed due to acceleration being applied after
   MAX_FAST_FALL_SPEED = 17,
-  JUMP_SPEED = -25,
+  JUMP_SPEED = -23,
   //general movement
   UP = 1,
   UP_RIGHT = 2,

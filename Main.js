@@ -5,6 +5,22 @@ let player;
 let levelList;
 let gamestate;
 let music = {};
+let keysPressed = {
+  ArrowUp: false,
+  ArrowRight: false,
+  ArrowDown: false,
+  ArrowLeft: false,
+  z: false,
+  x: false,
+  c: false,
+  w: false,
+  d: false,
+  s: false,
+  a: false,
+  j: false,
+  k: false,
+  l: false
+}
 
 function preload() {
   levelList = loadJSON("levelList.json");
@@ -29,6 +45,14 @@ function draw() {
   player.update();
   map.draw();
   player.draw();
+}
+
+function keyPressed() {
+  if (keysPressed[key] === false) keysPressed[key] = true;
+}
+
+function keyReleased(e) {
+  if (keysPressed[e.key] === true) keysPressed[e.key] = false;
 }
 
 //intersection magic
