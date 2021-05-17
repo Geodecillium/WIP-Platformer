@@ -46,6 +46,7 @@ class Player {
 
   update() {
     if (gamestate == GAME_DEAD) {
+      gamestate = GAME_PLAYING;
       this.spawn(this.respawn);
       return;
     }
@@ -55,6 +56,7 @@ class Player {
     if (keysPressed.z || keysPressed.j || this.counter.jumpBuffer > 0) {
       if (onGround && (!this.jumpHeld || this.counter.jumpBuffer > 0)) {
         this.state.fall = PLAYER_JUMP;
+        this.counter.jumpBuffer = 0;
       } else if (this.counter.jumpBuffer > 0) {
         this.counter.jumpBuffer--;
       } else if (!this.jumpHeld) {
@@ -123,6 +125,7 @@ class Player {
         break;
       case PLAYER_JUMP:
         if (this.counter.jump < 5) {
+          this.acc.y = 0;
           this.vel.y = JUMP_SPEED + JUMP_DEC_SPEED * this.counter.jump;
           this.counter.jump++;
         } else {
