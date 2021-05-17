@@ -35,7 +35,9 @@ const
   GRAVITY = 3,
   MAX_FALL_SPEED = 12, //3 less than actually max fall speed due to acceleration being applied after
   MAX_FAST_FALL_SPEED = 17,
-  JUMP_SPEED = -23,
+  JUMP_SPEED = -18,
+  JUMP_DEC_SPEED = 2,
+  JUMP_CANCEL_SPEED = 2.5,
   WALK_ACC_SPEED = 3.5,
   WALK_SPEED = 9,
   WALK_DEC_SPEED = 1.5,
