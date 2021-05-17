@@ -36,6 +36,11 @@ const
   MAX_FALL_SPEED = 12, //3 less than actually max fall speed due to acceleration being applied after
   MAX_FAST_FALL_SPEED = 17,
   JUMP_SPEED = -23,
+  WALK_ACC_SPEED = 3.5,
+  WALK_SPEED = 9,
+  WALK_DEC_SPEED = 1.5,
+  GROUND_FRICTION = 1,
+  AIR_FRICTION = 0.5,
   //general movement
   UP = 1,
   UP_RIGHT = 2,

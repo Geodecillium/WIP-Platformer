@@ -7,8 +7,6 @@ class Player {
       direction: RIGHT
     }
     this.counter = {
-      walkAcc: 0,
-      walkDec: 0,
       jump: 0,
       hangTime: 0
     }
@@ -52,7 +50,7 @@ class Player {
       return;
     }
     let onGround = map.level.map[floor(this.pos.x / BLOCK_SIZE)]?.[this.pos.y / BLOCK_SIZE + 2] === 1 || map.level.map[ceil(this.pos.x / BLOCK_SIZE)]?.[this.pos.y / BLOCK_SIZE + 2] === 1;
-    
+
     //input handling
     if (keysPressed.z || keysPressed.j) {
       if (onGround && !this.jumpHeld) {
@@ -64,6 +62,28 @@ class Player {
       if (this.state.fall === PLAYER_JUMP) {
         this.state.fall = PLAYER_CANCEL_JUMP;
       }
+    }
+    if ((keysPressed.d || keysPressed.ArrowRight) && (keysPressed.a || keysPressed.ArrowLeft)) {
+      if (this.state.direction === RIGHT) {
+        this.state.direction = LEFT;
+      } else {
+        this.state.direction = RIGHT;
+      }
+      if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
+        this.state.walk = PLAYER_WALK_DEC;
+      }
+    } else if (keysPressed.d || keysPressed.ArrowRight) {
+      this.state.direction = RIGHT;
+      if (this.state.walk !== PLAYER_WALK) {
+        this.state.walk = PLAYER_WALK_ACC;
+      }
+    } else if (keysPressed.a || keysPressed.ArrowLeft) {
+      this.state.direction = LEFT;
+      if (this.state.walk !== PLAYER_WALK) {
+        this.state.walk = PLAYER_WALK_ACC;
+      }
+    } else if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
+      this.state.walk = PLAYER_WALK_DEC;
     }
 
     //jumping/falling
@@ -125,6 +145,43 @@ class Player {
           this.counter.hangTime++;
         } else {
           this.state.fall = PLAYER_FALL;
+        }
+        break;
+    }
+
+    //left/right movement
+    let sign = this.state.direction === RIGHT ? 1 : -1;
+    switch (this.state.walk) {
+      case PLAYER_STILL:
+        if (this.vel > 0) {
+          this.state.walk = PLAYER_WALK_DEC;
+        }
+        break;
+      case PLAYER_WALK_ACC:
+        if (abs(this.vel.x) >= WALK_SPEED) {
+          this.acc.x = 0;
+          this.vel.x = sign * WALK_SPEED;
+          this.state.walk = PLAYER_WALK;
+        } else {
+          this.acc.x = sign * WALK_ACC_SPEED;
+        }
+        break;
+      case PLAYER_WALK:
+        if (abs(this.vel.x) <= WALK_SPEED) {
+          this.acc.x = 0;
+          this.vel.x = sign * WALK_SPEED;
+        } else if (onGround) {
+          this.acc.x = -sign * GROUND_FRICTION;
+        } else {
+          this.acc.x = -sign * AIR_FRICTION;
+        }
+      case PLAYER_WALK_DEC:
+        if (abs(this.vel.x) <= WALK_DEC_SPEED) {
+          this.acc.x = 0;
+          this.vel.x = 0;
+          this.state.walk = PLAYER_STILL;
+        } else {
+          this.acc.x = -sign * WALK_DEC_SPEED;
         }
         break;
     }
