@@ -192,8 +192,11 @@ class Player {
     this.pos.y += this.vel.y;
 
     //object collision detection
+    let checkRadius = sqrDist(this.pos.x, this.pos.y, prev.x, prev.y) + 3200;
     for (let object of map.objects) {
-      object.checkCollision?.(this, prev, 'player');
+      if (sqrDist(this.pos.x, this.pos.y, object.pos.x, object.pos.y) <= checkRadius) {
+        object.checkCollision?.(this, prev, 'player');
+      }
       if (gamestate == GAME_DEAD) break;
     }
   }

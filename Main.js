@@ -72,3 +72,8 @@ function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
   o4 = orient(x3, y3, x4, y4, x2, y2);
   return (o1 != o2 && o3 != o4) || (o1 == 0 && onSegment(x1, y1, x3, y3, x2, y2)) || (o2 == 0 && onSegment(x1, y1, x4, y4, x2, y2)) || (o3 == 0 && onSegment(x3, y3, x1, y1, x4, y4)) || (o4 == 0 && onSegment(x3, y3, x2, y2, x4, y4));
 }
+
+//keeping the square of the distance as the sqrt function is slow
+function sqrDist(x1, y1, x2, y2) {
+  return (x1 - x2) ** 2 + (y1 - y2) ** 2;
+}

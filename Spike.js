@@ -127,6 +127,30 @@ class Spike {
             y1: object.pos.y + object.height,
             x2: prevPos.x + object.width,
             y2: prevPos.y + object.height
+          },
+          {
+            x1: object.pos.x,
+            y1: object.pos.y,
+            x2: object.pos.x + object.width,
+            y2: object.pos.y
+          },
+          {
+            x1: object.pos.x + object.width,
+            y1: object.pos.y,
+            x2: object.pos.x + object.width,
+            y2: object.pos.y + object.height
+          },
+          {
+            x1: object.pos.x + object.width,
+            y1: object.pos.y + object.height,
+            x2: object.pos.x,
+            y2: object.pos.y + object.height
+          },
+          {
+            x1: object.pos.x,
+            y1: object.pos.y + object.height,
+            x2: object.pos.x,
+            y2: object.pos.y
           }
         ]
         for (let edge of edges) {
