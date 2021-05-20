@@ -31,7 +31,7 @@ function preload() {
 function setup() {
   createCanvas(1000, 800);
   noStroke();
-  frameRate(30);
+  frameRate(60);
 
   music.main.loop();
   player = new Player();

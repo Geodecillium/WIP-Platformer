@@ -33,7 +33,12 @@ class Player {
 
   spawn(entrance) {
     //reset player
-    this.direction = RIGHT;
+    this.state = {
+      animation: PLAYER_IDLE,
+      walk: PLAYER_STILL,
+      fall: PLAYER_GROUNDED,
+      direction: RIGHT
+    }
     this.acc.x = 0;
     this.acc.y = 0;
     this.vel.x = 0;
@@ -60,7 +65,7 @@ class Player {
       } else if (this.counter.jumpBuffer > 0) {
         this.counter.jumpBuffer--;
       } else if (!this.jumpHeld) {
-        this.counter.jumpBuffer = 3;
+        this.counter.jumpBuffer = 5;
       }
       this.jumpHeld = true;
     } else {
@@ -72,24 +77,24 @@ class Player {
       }
     }
     if ((keysPressed.d || keysPressed.ArrowRight) && (keysPressed.a || keysPressed.ArrowLeft)) {
-      if (this.state.direction === RIGHT) {
+      /*if (this.state.direction === RIGHT) {
         this.state.direction = LEFT;
       } else {
         this.state.direction = RIGHT;
-      }
+      }*/
       if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
         this.state.walk = PLAYER_WALK_DEC;
       }
     } else if (keysPressed.d || keysPressed.ArrowRight) {
+      if (this.state.walk !== PLAYER_WALK || this.state.direction == LEFT) {
+        this.state.walk = PLAYER_WALK_ACC;
+      }
       this.state.direction = RIGHT;
-      if (this.state.walk !== PLAYER_WALK) {
-        this.state.walk = PLAYER_WALK_ACC;
-      }
     } else if (keysPressed.a || keysPressed.ArrowLeft) {
-      this.state.direction = LEFT;
-      if (this.state.walk !== PLAYER_WALK) {
+      if (this.state.walk !== PLAYER_WALK || this.state.direction == RIGHT) {
         this.state.walk = PLAYER_WALK_ACC;
       }
+      this.state.direction = LEFT;
     } else if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
       this.state.walk = PLAYER_WALK_DEC;
     }
@@ -124,9 +129,11 @@ class Player {
         }
         break;
       case PLAYER_JUMP:
-        if (this.counter.jump < 5) {
-          this.acc.y = 0;
-          this.vel.y = JUMP_SPEED + JUMP_DEC_SPEED * this.counter.jump;
+        if (this.counter.jump < 10) {
+          if (this.counter.jump == 0) {
+            this.vel.y += JUMP_SPEED;
+          }
+          this.acc.y = JUMP_DEC_SPEED;
           this.counter.jump++;
         } else {
           this.counter.jump = 0;
@@ -145,8 +152,10 @@ class Player {
         break;
       case PLAYER_WALK_ACC:
         if (abs(this.vel.x) >= WALK_SPEED) {
+          if (abs(this.vel.x) - WALK_ACC_SPEED < WALK_SPEED) {
+            this.vel.x = sign * WALK_SPEED;
+          }
           this.acc.x = 0;
-          this.vel.x = sign * WALK_SPEED;
           this.state.walk = PLAYER_WALK;
         } else {
           this.acc.x = sign * WALK_ACC_SPEED;
