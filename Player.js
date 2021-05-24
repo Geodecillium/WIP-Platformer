@@ -71,19 +71,20 @@ class Player {
     } else {
       this.jumpHeld = false;
       if (this.state.fall === PLAYER_JUMP) {
-        this.vel.y += JUMP_CANCEL_SPEED * this.counter.jump;
+        this.vel.y += -0.04 * this.counter.jump ** 2 + 0.42 * this.counter.jump - 0.6;
         this.counter.jump = 0;
         this.state.fall = PLAYER_FALL;
       }
     }
     if ((keysPressed.d || keysPressed.ArrowRight) && (keysPressed.a || keysPressed.ArrowLeft)) {
-      /*if (this.state.direction === RIGHT) {
-        this.state.direction = LEFT;
-      } else {
-        this.state.direction = RIGHT;
-      }*/
       if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
         this.state.walk = PLAYER_WALK_DEC;
+      } else if (this.state.walk === PLAYER_STILL) {
+        if (this.state.direction === RIGHT) {
+          this.state.direction = LEFT;
+        } else {
+          this.state.direction = RIGHT;
+        }
       }
     } else if (keysPressed.d || keysPressed.ArrowRight) {
       if (this.state.walk !== PLAYER_WALK || this.state.direction == LEFT) {

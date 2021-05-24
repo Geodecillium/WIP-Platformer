@@ -30,6 +30,7 @@ function preload() {
 
 function setup() {
   createCanvas(1000, 800);
+  background(0, 128, 255);
   noStroke();
   frameRate(60);
 
@@ -41,6 +42,12 @@ function setup() {
 
 function draw() {
   background(0, 128, 255);
+  if (frameCount === 30) {
+    keysPressed.d = true;
+    keysPressed.j = true;
+  } else if (frameCount === 41) {
+    keysPressed.j = false;
+  }
   map.update();
   player.update();
   map.draw();
