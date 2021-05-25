@@ -49,6 +49,8 @@ const
   DASH_TIME = 3,
   DASH_REFILL_TIME = 5,
   DASH_COOLDOWN_TIME = 15,
+  CORNER_CORRECTION = 2,
+  DASH_CORNER_CORRECTION = 3,
   //general movement
   UP = 1,
   UP_RIGHT = 2,

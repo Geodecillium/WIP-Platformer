@@ -209,7 +209,6 @@ class Player {
         }
         break;
       case PLAYER_DASH:
-        console.log(this.counter.dash, this.vel.x)
         if (this.counter.dash < DASH_TIME) {
           this.acc.x = 0;
           this.acc.y = 0;
