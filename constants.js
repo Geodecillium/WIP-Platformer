@@ -24,13 +24,13 @@ const
   PLAYER_WALK_ACC = 2,
   PLAYER_WALK = 3,
   PLAYER_WALK_DEC = 4,
+  PLAYER_DASH = 5,
   //  fall
   PLAYER_GROUNDED = 1,
   PLAYER_FALL = 2,
   PLAYER_FAST_FALL = 3,
   PLAYER_JUMP = 4,
   PLAYER_CANCEL_JUMP = 5,
-  PLAYER_HANG = 6,
   //player math
   GRAVITY = 0.8,
   MAX_FALL_SPEED = 8,
@@ -42,6 +42,13 @@ const
   WALK_DEC_SPEED = 0.4,
   GROUND_FRICTION = 0.2,
   AIR_FRICTION = 0.1,
+  JUMP_TIME = 10,
+  JUMP_BUFFER_TIME = 5,
+  DASH_SPEED = 20,
+  DASH_DEC_SPEED = 10,
+  DASH_TIME = 3,
+  DASH_REFILL_TIME = 5,
+  DASH_COOLDOWN_TIME = 15,
   //general movement
   UP = 1,
   UP_RIGHT = 2,

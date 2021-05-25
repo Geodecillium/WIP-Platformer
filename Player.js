@@ -4,12 +4,16 @@ class Player {
       animation: PLAYER_IDLE,
       walk: PLAYER_STILL,
       fall: PLAYER_GROUNDED,
-      direction: RIGHT
+      direction: RIGHT,
+      dashDirection: RIGHT
     }
     this.counter = {
       jump: 0,
-      jumpBuffer: 0
+      jumpBuffer: 0,
+      dash: 0,
+      dashCooldown: 0
     }
+    this.dashes = 1;
     this.jumpHeld = false;
     this.height = 50;
     this.width = 25;
@@ -39,6 +43,12 @@ class Player {
       fall: PLAYER_GROUNDED,
       direction: RIGHT
     }
+    this.counter = {
+      jump: 0,
+      jumpBuffer: 0,
+      dash: 0,
+      dashCooldown: 0
+    }
     this.acc.x = 0;
     this.acc.y = 0;
     this.vel.x = 0;
@@ -65,39 +75,56 @@ class Player {
       } else if (this.counter.jumpBuffer > 0) {
         this.counter.jumpBuffer--;
       } else if (!this.jumpHeld) {
-        this.counter.jumpBuffer = 5;
+        this.counter.jumpBuffer = JUMP_BUFFER_TIME;
       }
       this.jumpHeld = true;
     } else {
       this.jumpHeld = false;
       if (this.state.fall === PLAYER_JUMP) {
         this.vel.y += -0.04 * this.counter.jump ** 2 + 0.42 * this.counter.jump - 0.6;
+        //decreases speed depending on when you let go of jump to get the best jump curves
         this.counter.jump = 0;
         this.state.fall = PLAYER_FALL;
       }
     }
-    if ((keysPressed.d || keysPressed.ArrowRight) && (keysPressed.a || keysPressed.ArrowLeft)) {
-      if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
-        this.state.walk = PLAYER_WALK_DEC;
-      } else if (this.state.walk === PLAYER_STILL) {
-        if (this.state.direction === RIGHT) {
-          this.state.direction = LEFT;
-        } else {
-          this.state.direction = RIGHT;
+    if (this.state.walk !== PLAYER_DASH) {
+      if ((keysPressed.d || keysPressed.ArrowRight) && (keysPressed.a || keysPressed.ArrowLeft)) {
+        if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
+          this.state.walk = PLAYER_WALK_DEC;
+        } else if (this.state.walk === PLAYER_STILL) {
+          if (this.state.direction === RIGHT) {
+            this.state.direction = LEFT;
+          } else {
+            this.state.direction = RIGHT;
+          }
         }
+      } else if (keysPressed.d || keysPressed.ArrowRight) {
+        if (this.state.walk !== PLAYER_WALK || this.state.direction == LEFT) {
+          this.state.walk = PLAYER_WALK_ACC;
+        }
+        this.state.direction = RIGHT;
+      } else if (keysPressed.a || keysPressed.ArrowLeft) {
+        if (this.state.walk !== PLAYER_WALK || this.state.direction == RIGHT) {
+          this.state.walk = PLAYER_WALK_ACC;
+        }
+        this.state.direction = LEFT;
+      } else if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
+        this.state.walk = PLAYER_WALK_DEC;
       }
-    } else if (keysPressed.d || keysPressed.ArrowRight) {
-      if (this.state.walk !== PLAYER_WALK || this.state.direction == LEFT) {
-        this.state.walk = PLAYER_WALK_ACC;
+    }
+    if (this.counter.dashCooldown < DASH_COOLDOWN_TIME || this.dashes === 0) {
+      this.counter.dashCooldown++;
+      if (this.counter.dashCooldown >= DASH_REFILL_TIME && onGround) {
+        this.dashes = 1;
       }
-      this.state.direction = RIGHT;
-    } else if (keysPressed.a || keysPressed.ArrowLeft) {
-      if (this.state.walk !== PLAYER_WALK || this.state.direction == RIGHT) {
-        this.state.walk = PLAYER_WALK_ACC;
-      }
-      this.state.direction = LEFT;
-    } else if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
-      this.state.walk = PLAYER_WALK_DEC;
+    } else if (keysPressed.l || keysPressed.c) {
+      this.state.walk = PLAYER_DASH;
+      this.state.dashDirection = this.state.direction;
+      this.dashes--;
+      this.counter.dash = 0;
+      this.counter.dashCooldown = 0;
+      keysPressed.l = false;
+      keysPressed.c = false;
     }
 
     //jumping/falling
@@ -130,7 +157,7 @@ class Player {
         }
         break;
       case PLAYER_JUMP:
-        if (this.counter.jump < 10) {
+        if (this.counter.jump < JUMP_TIME) {
           if (this.counter.jump == 0) {
             this.vel.y += JUMP_SPEED;
           }
@@ -145,6 +172,7 @@ class Player {
 
     //left/right movement
     let sign = this.state.direction === RIGHT ? 1 : -1;
+    let dashSign = this.state.dashDirection === RIGHT ? 1 : -1;
     switch (this.state.walk) {
       case PLAYER_STILL:
         if (this.vel > 0) {
@@ -180,6 +208,21 @@ class Player {
           this.acc.x = -sign * WALK_DEC_SPEED;
         }
         break;
+      case PLAYER_DASH:
+        console.log(this.counter.dash, this.vel.x)
+        if (this.counter.dash < DASH_TIME) {
+          this.acc.x = 0;
+          this.acc.y = 0;
+          this.vel.x = dashSign * DASH_SPEED;
+          this.vel.y = 0;
+        } else if (abs(this.vel.x) > WALK_SPEED) {
+          this.acc.x = 0;
+          this.vel.x *= 0.65
+        } else {
+          this.acc.x = 0;
+          this.state.walk = PLAYER_WALK;
+        }
+        this.counter.dash++;
     }
 
     //basic physics
