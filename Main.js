@@ -5,6 +5,7 @@ let player;
 let levelList;
 let gamestate;
 let music = {};
+let sprite = {};
 let keysPressed = {
   ArrowUp: false,
   ArrowRight: false,
@@ -26,6 +27,7 @@ function preload() {
   levelList = loadJSON("levelList.json");
   soundFormats("m4a");
   music.main = loadSound("Main theme.m4a");
+  sprite.player = loadImage("art/Mushroom_Man.png");
 }
 
 function setup() {
@@ -34,7 +36,7 @@ function setup() {
   noStroke();
   frameRate(60);
 
-  music.main.loop();
+  //music.main.loop();
   player = new Player();
   map = new Map("temp", "start");
   gamestate = GAME_PLAYING;

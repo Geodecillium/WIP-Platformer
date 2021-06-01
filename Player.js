@@ -15,8 +15,8 @@ class Player {
     }
     this.dashes = 1;
     this.jumpHeld = false;
-    this.height = 50;
-    this.width = 25;
+    this.height = 51;
+    this.width = 37.5;
     this.acc = {
       x: 0,
       y: 0
@@ -54,9 +54,9 @@ class Player {
     this.vel.x = 0;
     this.vel.y = 0;
     this.pos.x = entrance.x;
-    this.pos.y = entrance.y;
+    this.pos.y = entrance.y - this.height;
     this.respawn.x = entrance.x;
-    this.respawn.y = entrance.y;
+    this.respawn.y = entrance.y - this.height;
   }
 
   update() {
@@ -65,7 +65,7 @@ class Player {
       this.spawn(this.respawn);
       return;
     }
-    let onGround = map.level.map[floor(this.pos.x / BLOCK_SIZE)]?.[this.pos.y / BLOCK_SIZE + 2] === 1 || map.level.map[ceil(this.pos.x / BLOCK_SIZE)]?.[this.pos.y / BLOCK_SIZE + 2] === 1;
+    let onGround = map.level.map[floor(this.pos.x / BLOCK_SIZE)]?.[(this.pos.y + this.height) / BLOCK_SIZE] === 1 || map.level.map[ceil(this.pos.x / BLOCK_SIZE)]?.[(this.pos.y + this.height) / BLOCK_SIZE] === 1;
 
     //input handling
     if (keysPressed.z || keysPressed.j || this.counter.jumpBuffer > 0) {
@@ -245,7 +245,6 @@ class Player {
   }
 
   draw() {
-    fill(0, 255, 0);
-    rect(this.pos.x, this.pos.y, 25, this.height);
+    image(sprite.player, this.pos.x, this.pos.y, this.width, this.height);
   }
 }
