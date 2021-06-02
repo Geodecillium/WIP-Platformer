@@ -3,6 +3,7 @@
 let map;
 let player;
 let levelList;
+let animations;
 let gamestate;
 let music = {};
 let sprite = {};
@@ -25,9 +26,10 @@ let keysPressed = {
 
 function preload() {
   levelList = loadJSON("levelList.json");
+  animations = loadJSON("animations.json")
   soundFormats("m4a");
   music.main = loadSound("Main theme.m4a");
-  sprite.player = loadImage("art/Mushroom_Man.png");
+  sprite.player = loadImage("art/Player_Sheet.png");
 }
 
 function setup() {
@@ -36,8 +38,8 @@ function setup() {
   noStroke();
   frameRate(60);
 
-  //music.main.loop();
-  player = new Player();
+  music.main.loop();
+  player = new Player(sprite.player);
   map = new Map("temp", "start");
   gamestate = GAME_PLAYING;
 }

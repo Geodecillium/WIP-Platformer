@@ -1,11 +1,18 @@
 class Player {
-  constructor() {
+  constructor(spritesheet) {
     this.state = {
-      animation: PLAYER_IDLE,
+      animation: IDLE_ANIMATION,
       walk: PLAYER_STILL,
       fall: PLAYER_GROUNDED,
       direction: RIGHT,
       dashDirection: RIGHT
+    }
+    this.sprite = {
+      image: spritesheet,
+      x: 0,
+      y: 4,
+      width: 50,
+      height: 74
     }
     this.counter = {
       jump: 0,
@@ -38,7 +45,7 @@ class Player {
   spawn(entrance) {
     //reset player
     this.state = {
-      animation: PLAYER_IDLE,
+      animation: IDLE_ANIMATION,
       walk: PLAYER_STILL,
       fall: PLAYER_GROUNDED,
       direction: RIGHT
@@ -47,7 +54,11 @@ class Player {
       jump: 0,
       jumpBuffer: 0,
       dash: 0,
-      dashCooldown: 0
+      dashCooldown: 0,
+      animation: {
+        idle: 0,
+        walk: 0,
+      }
     }
     this.acc.x = 0;
     this.acc.y = 0;
@@ -56,7 +67,7 @@ class Player {
     this.pos.x = entrance.x;
     this.pos.y = entrance.y - this.height;
     this.respawn.x = entrance.x;
-    this.respawn.y = entrance.y - this.height;
+    this.respawn.y = entrance.y;
   }
 
   update() {
@@ -242,9 +253,44 @@ class Player {
       }
       if (gamestate == GAME_DEAD) break;
     }
+
+    //animation
+    switch (this.state.walk) {
+      case PLAYER_STILL:
+        this.state.animation = IDLE_ANIMATION;
+        break;
+      case PLAYER_WALK_ACC:
+      case PLAYER_WALK:
+      case PLAYER_WALK_DEC:
+        if (this.state.animation !== WALK_ANIMATION && onGround) {
+          this.state.animation = WALK_ANIMATION;
+          this.counter.animation.walk = 0;
+        } else if (this.state.animation === WALK_ANIMATION && !onGround) {
+          this.state.animation = IDLE_ANIMATION;
+        }
+        break;
+    }
   }
 
   draw() {
-    image(sprite.player, this.pos.x, this.pos.y, this.width, this.height);
+    switch (this.state.animation) {
+      case IDLE_ANIMATION:
+        this.sprite.x = animations.player.walk.x[0];
+        this.sprite.y = animations.player.walk.y[0];
+        break;
+      case WALK_ANIMATION:
+        //increment before so we skip the first frame
+        this.counter.animation.walk = (this.counter.animation.walk + 1/3) % animations.player.walk.length;
+        let id = floor(this.counter.animation.walk);
+        this.sprite.x = animations.player.walk.x[id];
+        this.sprite.y = animations.player.walk.y[id];
+        break;
+    }
+    if (this.state.direction === LEFT) {
+      //flips the image
+      applyMatrix(-1, 0, 0, 1, 2 * this.pos.x + this.width, 0);
+    }
+    image(this.sprite.image, this.pos.x, this.pos.y, this.width, this.height, this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height);
+    resetMatrix();
   }
 }

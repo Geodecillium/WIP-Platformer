@@ -18,7 +18,8 @@ const
   GAME_DEAD = 4,
   //player states
   //  animation
-  PLAYER_IDLE = 1,
+  IDLE_ANIMATION = 1,
+  WALK_ANIMATION = 2,
   //  walk
   PLAYER_STILL = 1,
   PLAYER_WALK_ACC = 2,
