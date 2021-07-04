@@ -19,7 +19,9 @@ const
   //player states
   //  animation
   IDLE_ANIMATION = 1,
-  WALK_ANIMATION = 2,
+  LEANING_IDLE_ANIMATION = 2,
+  WALK_ANIMATION = 3,
+  LEANING_WALK_ANIMATION = 4,
   //  walk
   PLAYER_STILL = 1,
   PLAYER_WALK_ACC = 2,
@@ -41,8 +43,8 @@ const
   WALK_ACC_SPEED = 1,
   WALK_SPEED = 5,
   WALK_DEC_SPEED = 0.4,
-  GROUND_FRICTION = 0.2,
-  AIR_FRICTION = 0.1,
+  GROUND_FRICTION = 0.4,
+  AIR_FRICTION = 0.7,
   JUMP_TIME = 10,
   JUMP_BUFFER_TIME = 5,
   DASH_SPEED = 20,
@@ -52,6 +54,11 @@ const
   DASH_COOLDOWN_TIME = 15,
   CORNER_CORRECTION = 2,
   DASH_CORNER_CORRECTION = 3,
+  //player hitbox
+  NORMAL_HEIGHT = 51.8,
+  NORMAL_WIDTH = 35,
+  LEANING_HEIGHT = 295 / 7,
+  LEANING_WIDTH = 325 / 7,
   //general movement
   UP = 1,
   UP_RIGHT = 2,

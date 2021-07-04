@@ -5,12 +5,13 @@ class Player {
       walk: PLAYER_STILL,
       fall: PLAYER_GROUNDED,
       direction: RIGHT,
-      dashDirection: RIGHT
+      dashDirection: RIGHT,
+      cap: UP
     }
-    this.sprite = {
+    this.sprites = {
       image: spritesheet,
       x: 0,
-      y: 4,
+      y: 0,
       width: 50,
       height: 74
     }
@@ -22,8 +23,8 @@ class Player {
     }
     this.dashes = 1;
     this.jumpHeld = false;
-    this.height = 51;
-    this.width = 37.5;
+    this.height = NORMAL_HEIGHT;
+    this.width = NORMAL_WIDTH;
     this.acc = {
       x: 0,
       y: 0
@@ -48,7 +49,9 @@ class Player {
       animation: IDLE_ANIMATION,
       walk: PLAYER_STILL,
       fall: PLAYER_GROUNDED,
-      direction: RIGHT
+      direction: RIGHT,
+      dashDirection: RIGHT,
+      cap: UP
     }
     this.counter = {
       jump: 0,
@@ -122,6 +125,15 @@ class Player {
       } else if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
         this.state.walk = PLAYER_WALK_DEC;
       }
+    }
+    if (keysPressed.k || keysPressed.x) {
+      if (!onGround && (keysPressed.s || keysPressed.ArrowDown)) {
+        this.state.cap = DOWN;
+      } else {
+        this.state.cap = this.state.direction;
+      }
+    } else {
+      this.state.cap = UP;
     }
     if (this.counter.dashCooldown < DASH_COOLDOWN_TIME || this.dashes === 0) {
       this.counter.dashCooldown++;
@@ -202,13 +214,13 @@ class Player {
         }
         break;
       case PLAYER_WALK:
+        this.acc.x = 0;
         if (abs(this.vel.x) <= WALK_SPEED) {
-          this.acc.x = 0;
           this.vel.x = sign * WALK_SPEED;
         } else if (onGround) {
-          this.acc.x = -sign * GROUND_FRICTION;
+          this.vel.x *= GROUND_FRICTION;
         } else {
-          this.acc.x = -sign * AIR_FRICTION;
+          this.acc.x *= AIR_FRICTION;
         }
       case PLAYER_WALK_DEC:
         if (abs(this.vel.x) <= WALK_DEC_SPEED) {
@@ -257,40 +269,88 @@ class Player {
     //animation
     switch (this.state.walk) {
       case PLAYER_STILL:
-        this.state.animation = IDLE_ANIMATION;
+        if (this.state.animation !== IDLE_ANIMATION && this.state.animation !== LEANING_IDLE_ANIMATION) {
+          this.state.animation = this.state.cap === UP ? IDLE_ANIMATION : LEANING_IDLE_ANIMATION;
+        }
         break;
       case PLAYER_WALK_ACC:
       case PLAYER_WALK:
       case PLAYER_WALK_DEC:
-        if (this.state.animation !== WALK_ANIMATION && onGround) {
-          this.state.animation = WALK_ANIMATION;
+        if (this.state.animation !== WALK_ANIMATION && this.state.animation !== LEANING_WALK_ANIMATION && onGround) {
+          this.state.animation = this.state.cap === UP ? WALK_ANIMATION : LEANING_WALK_ANIMATION;
           this.counter.animation.walk = 0;
-        } else if (this.state.animation === WALK_ANIMATION && !onGround) {
-          this.state.animation = IDLE_ANIMATION;
+        } else if ((this.state.animation === WALK_ANIMATION || this.state.animation === LEANING_WALK_ANIMATION) && this.state.animation !== IDLE_ANIMATION && this.state.animation !== LEANING_IDLE_ANIMATION && !onGround) {
+          this.state.animation = this.state.cap === UP ? IDLE_ANIMATION : LEANING_IDLE_ANIMATION;
         }
         break;
+    }
+
+    //leaning
+    if (this.state.cap === UP) {
+      switch (this.state.animation) {
+        case LEANING_IDLE_ANIMATION:
+          this.state.animation = IDLE_ANIMATION;
+          this.sprites.height = 10 / 7 * (this.height = NORMAL_HEIGHT);
+          this.sprites.width = 10 / 7 * (this.width = NORMAL_WIDTH);
+          this.pos.y -= NORMAL_HEIGHT - LEANING_HEIGHT
+          break;
+        case LEANING_WALK_ANIMATION:
+          this.state.animation = WALK_ANIMATION;
+          this.sprites.height = 10 / 7 * (this.height = NORMAL_HEIGHT);
+          this.sprites.width = 10 / 7 * (this.width = NORMAL_WIDTH);
+          this.pos.y -= NORMAL_HEIGHT - LEANING_HEIGHT
+          break;
+      }
+    } else {
+      switch (this.state.animation) {
+        case IDLE_ANIMATION:
+          this.state.animation = LEANING_IDLE_ANIMATION;
+          this.sprites.height = 10 / 7 * (this.height = LEANING_HEIGHT);
+          this.sprites.width = 10 / 7 * (this.width = LEANING_WIDTH);
+          this.pos.y += NORMAL_HEIGHT - LEANING_HEIGHT
+          break;
+        case WALK_ANIMATION:
+          this.state.animation = LEANING_WALK_ANIMATION;
+          this.sprites.height = 10 / 7 * (this.height = LEANING_HEIGHT);
+          this.sprites.width = 10 / 7 * (this.width = LEANING_WIDTH);
+          this.pos.y += NORMAL_HEIGHT - LEANING_HEIGHT
+          break;
+      }
     }
   }
 
   draw() {
+    let id;
     switch (this.state.animation) {
       case IDLE_ANIMATION:
-        this.sprite.x = animations.player.walk.x[0];
-        this.sprite.y = animations.player.walk.y[0];
+        this.sprites.x = animations.player.walk.x[0];
+        this.sprites.y = animations.player.walk.y[0];
+        break;
+      case LEANING_IDLE_ANIMATION:
+        this.sprites.x = animations.player.leaningWalk.x[0];
+        this.sprites.y = animations.player.leaningWalk.y[0];
         break;
       case WALK_ANIMATION:
         //increment before so we skip the first frame
-        this.counter.animation.walk = (this.counter.animation.walk + 1/3) % animations.player.walk.length;
-        let id = floor(this.counter.animation.walk);
-        this.sprite.x = animations.player.walk.x[id];
-        this.sprite.y = animations.player.walk.y[id];
+        this.counter.animation.walk = (this.counter.animation.walk + 1 / 3) % animations.player.walk.length;
+        id = floor(this.counter.animation.walk);
+        this.sprites.x = animations.player.walk.x[id];
+        this.sprites.y = animations.player.walk.y[id];
+        break;
+      case LEANING_WALK_ANIMATION:
+        //increment before so we skip the first frame
+        this.counter.animation.walk = (this.counter.animation.walk + 1 / 3) % animations.player.leaningWalk.length;
+        id = floor(this.counter.animation.walk);
+        this.sprites.x = animations.player.leaningWalk.x[id];
+        this.sprites.y = animations.player.leaningWalk.y[id];
         break;
     }
     if (this.state.direction === LEFT) {
       //flips the image
       applyMatrix(-1, 0, 0, 1, 2 * this.pos.x + this.width, 0);
     }
-    image(this.sprite.image, this.pos.x, this.pos.y, this.width, this.height, this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height);
+    //console.log(this.sprites.width, this.sprites.height)
+    image(this.sprites.image, this.pos.x, this.pos.y, this.width, this.height, this.sprites.x, this.sprites.y, this.sprites.width, this.sprites.height);
     resetMatrix();
   }
 }
