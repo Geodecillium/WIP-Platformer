@@ -54,11 +54,6 @@ const
   DASH_COOLDOWN_TIME = 15,
   CORNER_CORRECTION = 2,
   DASH_CORNER_CORRECTION = 3,
-  //player hitbox
-  NORMAL_HEIGHT = 51.8,
-  NORMAL_WIDTH = 35,
-  LEANING_HEIGHT = 295 / 7,
-  LEANING_WIDTH = 325 / 7,
   //general movement
   UP = 1,
   UP_RIGHT = 2,

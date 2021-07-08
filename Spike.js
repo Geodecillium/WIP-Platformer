@@ -105,52 +105,52 @@ class Spike {
       case 'player':
         let edges = [
           {
-            x1: object.pos.x,
-            y1: object.pos.y,
+            x1: object.hitbox.x,
+            y1: object.hitbox.y,
             x2: prevPos.x,
             y2: prevPos.y
           },
           {
-            x1: object.pos.x + object.width,
-            y1: object.pos.y,
-            x2: prevPos.x + object.width,
+            x1: object.hitbox.x + object.hitbox.width,
+            y1: object.hitbox.y,
+            x2: prevPos.x + object.hitbox.width,
             y2: prevPos.y
           },
           {
-            x1: object.pos.x,
-            y1: object.pos.y + object.height,
+            x1: object.hitbox.x,
+            y1: object.hitbox.y + object.hitbox.height,
             x2: prevPos.x,
-            y2: prevPos.y + object.height
+            y2: prevPos.y + object.hitbox.height
           },
           {
-            x1: object.pos.x + object.width,
-            y1: object.pos.y + object.height,
-            x2: prevPos.x + object.width,
-            y2: prevPos.y + object.height
+            x1: object.hitbox.x + object.hitbox.width,
+            y1: object.hitbox.y + object.hitbox.height,
+            x2: prevPos.x + object.hitbox.width,
+            y2: prevPos.y + object.hitbox.height
           },
           {
-            x1: object.pos.x,
-            y1: object.pos.y,
-            x2: object.pos.x + object.width,
-            y2: object.pos.y
+            x1: object.hitbox.x,
+            y1: object.hitbox.y,
+            x2: object.hitbox.x + object.hitbox.width,
+            y2: object.hitbox.y
           },
           {
-            x1: object.pos.x + object.width,
-            y1: object.pos.y,
-            x2: object.pos.x + object.width,
-            y2: object.pos.y + object.height
+            x1: object.hitbox.x + object.hitbox.width,
+            y1: object.hitbox.y,
+            x2: object.hitbox.x + object.hitbox.width,
+            y2: object.hitbox.y + object.hitbox.height
           },
           {
-            x1: object.pos.x + object.width,
-            y1: object.pos.y + object.height,
-            x2: object.pos.x,
-            y2: object.pos.y + object.height
+            x1: object.hitbox.x + object.hitbox.width,
+            y1: object.hitbox.y + object.hitbox.height,
+            x2: object.hitbox.x,
+            y2: object.hitbox.y + object.hitbox.height
           },
           {
-            x1: object.pos.x,
-            y1: object.pos.y + object.height,
-            x2: object.pos.x,
-            y2: object.pos.y
+            x1: object.hitbox.x,
+            y1: object.hitbox.y + object.hitbox.height,
+            x2: object.hitbox.x,
+            y2: object.hitbox.y
           }
         ]
         for (let edge of edges) {

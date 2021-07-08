@@ -48,8 +48,8 @@ function draw() {
   background(0, 128, 255);
   map.update();
   player.update();
-  map.draw();
   player.draw();
+  map.draw();
 }
 
 function keyPressed() {
