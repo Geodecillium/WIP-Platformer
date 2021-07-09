@@ -432,8 +432,8 @@ class Player {
     image(this.sprites.image, this.pos.x, this.pos.y, this.width, this.height, this.sprites.x, this.sprites.y, this.sprites.width, this.sprites.height);
     resetMatrix();
     fill(0, 255, 0, 80)
-    rect(this.cap.x, this.cap.y, this.cap.width, this.cap.height)
-    rect(this.hitbox.x, this.hitbox.y, this.hitbox.width, this.hitbox.height)
+    //rect(this.cap.x, this.cap.y, this.cap.width, this.cap.height)
+    //rect(this.hitbox.x, this.hitbox.y, this.hitbox.width, this.hitbox.height)
     //rect(this.pos.x + (this.state.direction === RIGHT ? 0 : -this.width + 2 * this.hitbox.xOff + this.hitbox.width), this.pos.y, this.width, this.height)
   }
 }
