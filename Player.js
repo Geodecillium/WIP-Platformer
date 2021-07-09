@@ -154,7 +154,7 @@ class Player {
         }
         this.state.direction = LEFT;
       } else if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
-        this.state.walk = PLAYER_WALK_DEC;
+        this.state.walk = PLAYER_STILL;
       }
     }
     if (keysPressed.k || keysPressed.x) {
@@ -236,8 +236,13 @@ class Player {
     let dashSign = this.state.dashDirection === RIGHT ? 1 : -1;
     switch (this.state.walk) {
       case PLAYER_STILL:
-        if (this.vel > 0) {
-          this.state.walk = PLAYER_WALK_DEC;
+        this.acc.x = 0;
+        if (abs(this.vel.x) <= 1) {
+          this.vel.x = 0;
+        } else if (onGround) {
+          this.vel.x *= GROUND_FRICTION;
+        } else {
+          this.vel.x *= AIR_FRICTION;
         }
         break;
       case PLAYER_WALK_ACC:
@@ -253,21 +258,12 @@ class Player {
         break;
       case PLAYER_WALK:
         this.acc.x = 0;
-        if (abs(this.vel.x) <= WALK_SPEED) {
+        if (abs(sign * this.vel.x - WALK_SPEED) <= 1) {
           this.vel.x = sign * WALK_SPEED;
         } else if (onGround) {
-          this.vel.x *= GROUND_FRICTION;
+          this.vel.x = (this.vel.x - sign * WALK_SPEED) * GROUND_FRICTION + sign * WALK_SPEED;
         } else {
-          this.acc.x *= AIR_FRICTION;
-        }
-        break;
-      case PLAYER_WALK_DEC:
-        if (sign * this.vel.x <= WALK_DEC_SPEED) {
-          this.acc.x = 0;
-          this.vel.x = 0;
-          this.state.walk = PLAYER_STILL;
-        } else {
-          this.acc.x = -sign * WALK_DEC_SPEED;
+          this.vel.x = (this.vel.x - sign * WALK_SPEED) * AIR_FRICTION + sign * WALK_SPEED;
         }
         break;
       case PLAYER_DASH:
@@ -286,32 +282,21 @@ class Player {
         this.counter.dash++;
     }
 
+    let capXOff = this.state.direction === RIGHT ? this.cap.xOff : 2 * this.hitbox.xOff + this.hitbox.width - this.cap.xOff - this.cap.width - 0.7;
+
     //basic physics
     let prev = {
       x: this.pos.x + this.hitbox.xOff,
       y: this.pos.y + this.hitbox.yOff
     }
+    let prevCap = {
+      x: this.pos.x + capXOff,
+      y: this.pos.y + this.cap.yOff
+    }
     this.vel.x += this.acc.x;
     this.vel.y += this.acc.y;
     this.pos.x += this.vel.x;
     this.pos.y += this.vel.y;
-    this.hitbox.x = this.pos.x + this.hitbox.xOff;
-    this.hitbox.y = this.pos.y + this.hitbox.yOff;
-    this.cap.x = this.pos.x + this.cap.xOff;
-    this.cap.y = this.pos.y + this.cap.yOff;
-
-    //object collision detection
-    let checkRadius = sqrDist(this.pos.x, this.pos.y, prev.x, prev.y) + 3200;
-    for (let object of map.objects) {
-      if (sqrDist(this.pos.x, this.pos.y, object.pos.x, object.pos.y) <= checkRadius) {
-        object.checkCollision?.(this, prev, 'player');
-        this.pos.x = this.hitbox.x - this.hitbox.xOff;
-        this.pos.y = this.hitbox.y - this.hitbox.yOff;
-        this.cap.x = this.pos.x + this.cap.xOff;
-        this.cap.y = this.pos.y + this.cap.yOff;
-      }
-      if (gamestate == GAME_DEAD) break;
-    }
 
     //animation
     switch (this.state.walk) {
@@ -322,7 +307,6 @@ class Player {
         break;
       case PLAYER_WALK_ACC:
       case PLAYER_WALK:
-      case PLAYER_WALK_DEC:
         if (this.state.animation !== WALK_ANIMATION && this.state.animation !== LEANING_WALK_ANIMATION && onGround) {
           this.counter.animation.walk = 0;
           this.changeAnimation(this.cap.direction === UP ? WALK_ANIMATION : LEANING_WALK_ANIMATION, this.cap.direction === UP ? 35 : 46.2, this.cap.direction === UP ? 51.8 : 43.4, this.cap.direction === UP ? 4.2 : 2.8, this.cap.direction === UP ? 22.4 : 11.2, this.cap.direction === UP ? 26.6 : 23.8, this.cap.direction === UP ? 29.4 : 32.2, this.cap.direction === UP ? 0 : 23.8, 2.8, this.cap.direction === UP ? 35 : 22.4, this.cap.direction === UP ? 22.4 : 35, this.cap.changed ? this.cap.direction === UP ? -8.4 : 8.4 : 0);
@@ -351,6 +335,53 @@ class Player {
           this.changeAnimation(LEANING_IDLE_ANIMATION, 46.2, 43.4, 2.8, 8.4 + this.runHeight(), 23.8, 32.2, 23.8, this.runHeight(), 22.4, 35, 8.4);
           break;
       }
+    }
+
+    capXOff = this.state.direction === RIGHT ? this.cap.xOff : 2 * this.hitbox.xOff + this.hitbox.width - this.cap.xOff - this.cap.width - 0.7;
+    this.hitbox.x = this.pos.x + this.hitbox.xOff;
+    this.hitbox.y = this.pos.y + this.hitbox.yOff;
+    this.cap.x = this.pos.x + capXOff;
+    this.cap.y = this.pos.y + this.cap.yOff;
+
+    //object collision detection
+    let checkRadius = sqrDist(this.hitbox.x, this.hitbox.y, prev.x, prev.y) + 3200;
+    for (let object of map.objects) {
+      if (sqrDist(this.hitbox.x, this.hitbox.y, object.pos.x, object.pos.y) <= checkRadius) {
+        object.checkCollision?.(this, prev, 'player', (x, y, w, h) => {
+          this.pos.y = y - this.hitbox.height - this.hitbox.yOff;
+          this.vel.y = 0;
+        }, (x, y, w, h) => {
+          this.pos.y = y + h - this.hitbox.yOff;
+          this.vel.y = 0;
+        }, (x, y, w, h) => {
+          this.pos.x = x - this.hitbox.width - this.hitbox.xOff;
+          this.vel.x = 0;
+        }, (x, y, w, h) => {
+          this.pos.x = x + w - this.hitbox.xOff;
+          this.vel.x = 0;
+        });
+        object.checkCollision?.(this, prevCap, 'cap', (x, y, w, h) => {
+          this.pos.y = y - this.cap.height - this.cap.yOff;
+          this.vel.y = 0;
+        }, (x, y, w, h) => {
+          this.pos.y = y + h - this.cap.yOff;
+          this.vel.y = 0;
+        }, (x, y, w, h) => {
+          this.pos.x = x - this.cap.width - capXOff;
+          this.vel.x = -max(20, 2 * this.vel.x);
+          this.state.walk = this.state.walk === PLAYER_STILL ? PLAYER_STILL : PLAYER_WALK;
+        }, (x, y, w, h) => {
+          this.pos.x = x + w - capXOff;
+          this.vel.x = max(20, 2 * this.vel.x);
+          this.state.walk = this.state.walk === PLAYER_STILL ? PLAYER_STILL : PLAYER_WALK;
+        });
+        capXOff = this.state.direction === RIGHT ? this.cap.xOff : 2 * this.hitbox.xOff + this.hitbox.width - this.cap.xOff - this.cap.width - 0.7;
+        this.hitbox.x = this.pos.x + this.hitbox.xOff;
+        this.hitbox.y = this.pos.y + this.hitbox.yOff;
+        this.cap.x = this.pos.x + capXOff;
+        this.cap.y = this.pos.y + this.cap.yOff;
+      }
+      if (gamestate == GAME_DEAD) break;
     }
   }
 
@@ -399,10 +430,10 @@ class Player {
     }
     //console.log(this.sprites.width, this.sprites.height)
     image(this.sprites.image, this.pos.x, this.pos.y, this.width, this.height, this.sprites.x, this.sprites.y, this.sprites.width, this.sprites.height);
+    resetMatrix();
     fill(0, 255, 0, 80)
     rect(this.cap.x, this.cap.y, this.cap.width, this.cap.height)
     rect(this.hitbox.x, this.hitbox.y, this.hitbox.width, this.hitbox.height)
-    //rect(this.pos.x, this.pos.y, this.width, this.height)
-    resetMatrix();
+    //rect(this.pos.x + (this.state.direction === RIGHT ? 0 : -this.width + 2 * this.hitbox.xOff + this.hitbox.width), this.pos.y, this.width, this.height)
   }
 }
