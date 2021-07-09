@@ -368,11 +368,11 @@ class Player {
           this.vel.y = 0;
         }, (x, y, w, h) => {
           this.pos.x = x - this.cap.width - capXOff;
-          this.vel.x = -max(20, 2 * this.vel.x);
+          this.vel.x = -max(20, 2 * abs(this.vel.x));
           this.state.walk = this.state.walk === PLAYER_STILL ? PLAYER_STILL : PLAYER_WALK;
         }, (x, y, w, h) => {
           this.pos.x = x + w - capXOff;
-          this.vel.x = max(20, 2 * this.vel.x);
+          this.vel.x = max(20, 2 * abs(this.vel.x));
           this.state.walk = this.state.walk === PLAYER_STILL ? PLAYER_STILL : PLAYER_WALK;
         });
         capXOff = this.state.direction === RIGHT ? this.cap.xOff : 2 * this.hitbox.xOff + this.hitbox.width - this.cap.xOff - this.cap.width - 0.7;
