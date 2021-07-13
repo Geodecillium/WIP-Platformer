@@ -26,13 +26,12 @@ const
   PLAYER_STILL = 1,
   PLAYER_WALK_ACC = 2,
   PLAYER_WALK = 3,
-  PLAYER_DASH = 5,
+  PLAYER_DASH = 4,
   //  fall
   PLAYER_GROUNDED = 1,
   PLAYER_FALL = 2,
   PLAYER_FAST_FALL = 3,
   PLAYER_JUMP = 4,
-  PLAYER_CANCEL_JUMP = 5,
   //player math
   GRAVITY = 0.8,
   MAX_FALL_SPEED = 8,

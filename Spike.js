@@ -101,67 +101,63 @@ class Spike {
   }
 
   checkCollision(object, prevPos, name) {
-    switch (name) {
-      case 'player':
-        let edges = [
-          {
-            x1: object.hitbox.x,
-            y1: object.hitbox.y,
-            x2: prevPos.x,
-            y2: prevPos.y
-          },
-          {
-            x1: object.hitbox.x + object.hitbox.width,
-            y1: object.hitbox.y,
-            x2: prevPos.x + object.hitbox.width,
-            y2: prevPos.y
-          },
-          {
-            x1: object.hitbox.x,
-            y1: object.hitbox.y + object.hitbox.height,
-            x2: prevPos.x,
-            y2: prevPos.y + object.hitbox.height
-          },
-          {
-            x1: object.hitbox.x + object.hitbox.width,
-            y1: object.hitbox.y + object.hitbox.height,
-            x2: prevPos.x + object.hitbox.width,
-            y2: prevPos.y + object.hitbox.height
-          },
-          {
-            x1: object.hitbox.x,
-            y1: object.hitbox.y,
-            x2: object.hitbox.x + object.hitbox.width,
-            y2: object.hitbox.y
-          },
-          {
-            x1: object.hitbox.x + object.hitbox.width,
-            y1: object.hitbox.y,
-            x2: object.hitbox.x + object.hitbox.width,
-            y2: object.hitbox.y + object.hitbox.height
-          },
-          {
-            x1: object.hitbox.x + object.hitbox.width,
-            y1: object.hitbox.y + object.hitbox.height,
-            x2: object.hitbox.x,
-            y2: object.hitbox.y + object.hitbox.height
-          },
-          {
-            x1: object.hitbox.x,
-            y1: object.hitbox.y + object.hitbox.height,
-            x2: object.hitbox.x,
-            y2: object.hitbox.y
-          }
-        ]
-        for (let edge of edges) {
-          for (let i in this.vertices) {
-            if (intersect(edge.x1, edge.y1, edge.x2, edge.y2, this.hitbox[i].x, this.hitbox[i].y, this.hitbox[(i - -1) % 3].x, this.hitbox[(i - -1) % 3].y)) {
-              gamestate = GAME_DEAD;
-              return;
-            }
-          }
+    let edges = [
+      {
+        x1: object.hitbox.x,
+        y1: object.hitbox.y,
+        x2: prevPos.x,
+        y2: prevPos.y
+      },
+      {
+        x1: object.hitbox.x + object.hitbox.width,
+        y1: object.hitbox.y,
+        x2: prevPos.x + prevPos.width,
+        y2: prevPos.y
+      },
+      {
+        x1: object.hitbox.x,
+        y1: object.hitbox.y + object.hitbox.height,
+        x2: prevPos.x,
+        y2: prevPos.y + prevPos.height
+      },
+      {
+        x1: object.hitbox.x + object.hitbox.width,
+        y1: object.hitbox.y + object.hitbox.height,
+        x2: prevPos.x + prevPos.width,
+        y2: prevPos.y + prevPos.height
+      },
+      {
+        x1: object.hitbox.x,
+        y1: object.hitbox.y,
+        x2: object.hitbox.x + object.hitbox.width,
+        y2: object.hitbox.y
+      },
+      {
+        x1: object.hitbox.x + object.hitbox.width,
+        y1: object.hitbox.y,
+        x2: object.hitbox.x + object.hitbox.width,
+        y2: object.hitbox.y + object.hitbox.height
+      },
+      {
+        x1: object.hitbox.x + object.hitbox.width,
+        y1: object.hitbox.y + object.hitbox.height,
+        x2: object.hitbox.x,
+        y2: object.hitbox.y + object.hitbox.height
+      },
+      {
+        x1: object.hitbox.x,
+        y1: object.hitbox.y + object.hitbox.height,
+        x2: object.hitbox.x,
+        y2: object.hitbox.y
+      }
+    ]
+    for (let edge of edges) {
+      for (let i in this.vertices) {
+        if (intersect(edge.x1, edge.y1, edge.x2, edge.y2, this.hitbox[i].x, this.hitbox[i].y, this.hitbox[(i - -1) % 3].x, this.hitbox[(i - -1) % 3].y)) {
+          gamestate = GAME_DEAD;
+          return;
         }
-        break;
+      }
     }
   }
 

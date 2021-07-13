@@ -25,9 +25,12 @@ class Player {
       }
     }
     this.dashes = 1;
+    this.dashHeld = false;
+    this.dashEnd = false;
     this.jumpHeld = false;
     this.bothHeld = false;
-    this.height = 51.8;
+    this.prevDir = RIGHT;
+    this.height = 51.9;
     this.width = 35;
     this.center = 17.5;
     this.acc = {
@@ -72,6 +75,20 @@ class Player {
     player.pos.y = entrance.y - player.height;
     player.respawn.x = entrance.x;
     player.respawn.y = entrance.y;
+    //keysPressed.ArrowUp = false,
+    //keysPressed.ArrowRight = false,
+    //keysPressed.ArrowDown = false,
+    //keysPressed.ArrowLeft = false,
+    keysPressed.z = false,
+      //keysPressed.x = false,
+      keysPressed.c = false,
+      //keysPressed.w = false,
+      //keysPressed.d = false,
+      //keysPressed.s = false,
+      //keysPressed.a = false,
+      keysPressed.j = false,
+      //keysPressed.k = false,
+      keysPressed.l = false
   }
 
   runHeight() {
@@ -98,13 +115,27 @@ class Player {
     if (gamestate == GAME_DEAD || this.pos.y > map.level.map[0].length * 25) {
       gamestate = GAME_PLAYING;
       this.spawn(this.respawn);
+      //frameCount = 0;
       return;
     }
     let onGround = map.level.map[floor(this.pos.x / BLOCK_SIZE)]?.[round(this.pos.y + this.height) / BLOCK_SIZE] === 1 || map.level.map[ceil(this.pos.x / BLOCK_SIZE)]?.[round(this.pos.y + this.height) / BLOCK_SIZE] === 1;
+    let capXOff = this.prevDir === RIGHT ? this.cap.xOff : 2 * this.hitbox.xOff + this.hitbox.width - this.cap.xOff - this.cap.width - 0.7;
+    let prev = {
+      x: this.pos.x + this.hitbox.xOff,
+      y: this.pos.y + this.hitbox.yOff,
+      width: this.hitbox.width,
+      height: this.hitbox.height
+    }
+    let prevCap = {
+      x: this.pos.x + capXOff + (this.prevDir === RIGHT ? -5 : 5),
+      y: this.pos.y + this.cap.yOff,
+      width: this.cap.width,
+      height: this.cap.height
+    }
 
     //input handling
     if (keysPressed.z || keysPressed.j || this.counter.jumpBuffer > 0) {
-      if (onGround && (!this.jumpHeld || this.counter.jumpBuffer > 0)) {
+      if (onGround && this.state.walk !== PLAYER_DASH && (!this.jumpHeld || this.counter.jumpBuffer > 0)) {
         this.state.fall = PLAYER_JUMP;
         this.counter.jumpBuffer = 0;
       } else if (this.counter.jumpBuffer > 0) {
@@ -122,38 +153,39 @@ class Player {
         this.state.fall = PLAYER_FALL;
       }
     }
+    if (this.state.direction !== this.prevDir) this.prevDir = this.state.direction;
     if (this.state.walk !== PLAYER_DASH) {
       if ((keysPressed.d || keysPressed.ArrowRight) && (keysPressed.a || keysPressed.ArrowLeft) && !this.bothHeld) {
         if (this.state.direction === RIGHT) {
-          this.state.walk = PLAYER_WALK_ACC;
+          this.state.walk = PLAYER_WALK;
           this.state.direction = LEFT;
           this.bothHeld = true;
         } else {
-          this.state.walk = PLAYER_WALK_ACC;
+          this.state.walk = PLAYER_WALK;
           this.state.direction = RIGHT;
           this.bothHeld = true;
         }
       } else if (this.bothHeld) {
         if (!(keysPressed.d || keysPressed.ArrowRight)) {
-          this.state.walk = PLAYER_WALK_ACC;
+          this.state.walk = PLAYER_WALK;
           this.state.direction = LEFT;
           this.bothHeld = false;
         } else if (!(keysPressed.a || keysPressed.ArrowLeft)) {
-          this.state.walk = PLAYER_WALK_ACC;
+          this.state.walk = PLAYER_WALK;
           this.state.direction = RIGHT;
           this.bothHeld = false;
         }
       } else if (keysPressed.d || keysPressed.ArrowRight) {
         if (this.state.walk !== PLAYER_WALK || this.state.direction == LEFT) {
-          this.state.walk = PLAYER_WALK_ACC;
+          this.state.walk = PLAYER_WALK;
         }
         this.state.direction = RIGHT;
       } else if (keysPressed.a || keysPressed.ArrowLeft) {
         if (this.state.walk !== PLAYER_WALK || this.state.direction == RIGHT) {
-          this.state.walk = PLAYER_WALK_ACC;
+          this.state.walk = PLAYER_WALK;
         }
         this.state.direction = LEFT;
-      } else if (this.state.walk === PLAYER_WALK || this.state.walk === PLAYER_WALK_ACC) {
+      } else if (this.state.walk === PLAYER_WALK) {
         this.state.walk = PLAYER_STILL;
       }
     }
@@ -200,6 +232,7 @@ class Player {
       case PLAYER_FALL:
         if (onGround) {
           this.state.fall = PLAYER_GROUNDED;
+          this.acc.y = 0;
         } else {
           this.acc.y = GRAVITY;
           if (this.vel.y > MAX_FALL_SPEED) {
@@ -210,6 +243,7 @@ class Player {
       case PLAYER_FAST_FALL:
         if (onGround) {
           this.state.fall = PLAYER_GROUNDED;
+          this.acc.y = 0;
         } else {
           this.acc.y = GRAVITY;
           if (this.vel.y > MAX_FAST_FALL_SPEED) {
@@ -239,27 +273,21 @@ class Player {
         this.acc.x = 0;
         if (abs(this.vel.x) <= 1) {
           this.vel.x = 0;
+        } else if (this.dashEnd) {
+          this.vel.x *= 0.65
         } else if (onGround) {
           this.vel.x *= GROUND_FRICTION;
         } else {
           this.vel.x *= AIR_FRICTION;
         }
         break;
-      case PLAYER_WALK_ACC:
-        if (sign * this.vel.x >= WALK_SPEED) {
-          if (sign * this.vel.x - WALK_ACC_SPEED < WALK_SPEED) {
-            this.vel.x = sign * WALK_SPEED;
-          }
-          this.acc.x = 0;
-          this.state.walk = PLAYER_WALK;
-        } else {
-          this.acc.x = sign * WALK_ACC_SPEED;
-        }
-        break;
       case PLAYER_WALK:
         this.acc.x = 0;
         if (abs(sign * this.vel.x - WALK_SPEED) <= 1) {
           this.vel.x = sign * WALK_SPEED;
+        } else if (this.dashEnd) {
+          this.vel.x = (this.vel.x - sign * WALK_SPEED) * 0.2 + sign * WALK_SPEED;
+          this.dashEnd = false;
         } else if (onGround) {
           this.vel.x = (this.vel.x - sign * WALK_SPEED) * GROUND_FRICTION + sign * WALK_SPEED;
         } else {
@@ -272,27 +300,15 @@ class Player {
           this.acc.y = 0;
           this.vel.x = dashSign * DASH_SPEED;
           this.vel.y = 0;
-        } else if (abs(this.vel.x) > WALK_SPEED) {
-          this.acc.x = 0;
-          this.vel.x *= 0.65
         } else {
-          this.acc.x = 0;
-          this.state.walk = PLAYER_WALK;
+          this.dashEnd = true;
+          this.state.walk = keysPressed.a || keysPressed.d || keysPressed.ArrowLeft || keysPressed.ArrowRight ? PLAYER_WALK : PLAYER_STILL;
         }
         this.counter.dash++;
+        break;
     }
-
-    let capXOff = this.state.direction === RIGHT ? this.cap.xOff : 2 * this.hitbox.xOff + this.hitbox.width - this.cap.xOff - this.cap.width - 0.7;
 
     //basic physics
-    let prev = {
-      x: this.pos.x + this.hitbox.xOff,
-      y: this.pos.y + this.hitbox.yOff
-    }
-    let prevCap = {
-      x: this.pos.x + capXOff,
-      y: this.pos.y + this.cap.yOff
-    }
     this.vel.x += this.acc.x;
     this.vel.y += this.acc.y;
     this.pos.x += this.vel.x;
@@ -305,7 +321,6 @@ class Player {
           this.changeAnimation(this.cap.direction === UP ? IDLE_ANIMATION : LEANING_IDLE_ANIMATION, this.cap.direction === UP ? 35 : 46.2, this.cap.direction === UP ? 51.8 : 43.4, this.cap.direction === UP ? 4.2 : 2.8, this.cap.direction === UP ? 22.4 : 11.2, this.cap.direction === UP ? 26.6 : 23.8, this.cap.direction === UP ? 29.4 : 32.2, this.cap.direction === UP ? 0 : 23.8, 2.8, this.cap.direction === UP ? 35 : 22.4, this.cap.direction === UP ? 22.4 : 35, this.cap.changed ? this.cap.direction === UP ? -8.4 : 8.4 : 0);
         }
         break;
-      case PLAYER_WALK_ACC:
       case PLAYER_WALK:
         if (this.state.animation !== WALK_ANIMATION && this.state.animation !== LEANING_WALK_ANIMATION && onGround) {
           this.counter.animation.walk = 0;
@@ -347,25 +362,30 @@ class Player {
     let checkRadius = sqrDist(this.hitbox.x, this.hitbox.y, prev.x, prev.y) + 3200;
     for (let object of map.objects) {
       if (sqrDist(this.hitbox.x, this.hitbox.y, object.pos.x, object.pos.y) <= checkRadius) {
+        let checkCap = true;
         object.checkCollision?.(this, prev, 'player', (x, y, w, h) => {
           this.pos.y = y - this.hitbox.height - this.hitbox.yOff;
           this.vel.y = 0;
+          if (this.cap.direction !== DOWN) checkCap = false;
         }, (x, y, w, h) => {
           this.pos.y = y + h - this.hitbox.yOff;
           this.vel.y = 0;
+          if (this.cap.direction === DOWN) checkCap = false;
         }, (x, y, w, h) => {
           this.pos.x = x - this.hitbox.width - this.hitbox.xOff;
           this.vel.x = 0;
+          if (this.cap.direction === LEFT) checkCap = false;
         }, (x, y, w, h) => {
           this.pos.x = x + w - this.hitbox.xOff;
           this.vel.x = 0;
+          if (this.cap.direction === RIGHT) checkCap = false;
         });
-        object.checkCollision?.(this, prevCap, 'cap', (x, y, w, h) => {
+        if (checkCap) object.checkCollision?.(this, prevCap, 'cap', (x, y, w, h) => {
           this.pos.y = y - this.cap.height - this.cap.yOff;
-          this.vel.y = 0;
+          //this.vel.y = 0;
         }, (x, y, w, h) => {
           this.pos.y = y + h - this.cap.yOff;
-          this.vel.y = 0;
+          //this.vel.y = 0;
         }, (x, y, w, h) => {
           this.pos.x = x - this.cap.width - capXOff;
           this.vel.x = -max(20, 2 * abs(this.vel.x));
@@ -383,6 +403,7 @@ class Player {
       }
       if (gamestate == GAME_DEAD) break;
     }
+    if (round((this.hitbox.y + this.hitbox.height) * 10) / 10 > 775) console.log(prev, this.hitbox), noLoop();
   }
 
   draw() {
@@ -432,8 +453,8 @@ class Player {
     image(this.sprites.image, this.pos.x, this.pos.y, this.width, this.height, this.sprites.x, this.sprites.y, this.sprites.width, this.sprites.height);
     resetMatrix();
     fill(0, 255, 0, 80)
-    //rect(this.cap.x, this.cap.y, this.cap.width, this.cap.height)
-    //rect(this.hitbox.x, this.hitbox.y, this.hitbox.width, this.hitbox.height)
+    rect(this.cap.x, this.cap.y, this.cap.width, this.cap.height)
+    rect(this.hitbox.x, this.hitbox.y, this.hitbox.width, this.hitbox.height)
     //rect(this.pos.x + (this.state.direction === RIGHT ? 0 : -this.width + 2 * this.hitbox.xOff + this.hitbox.width), this.pos.y, this.width, this.height)
   }
 }
