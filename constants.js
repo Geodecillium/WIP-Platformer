@@ -34,8 +34,8 @@ const
   PLAYER_JUMP = 4,
   //player math
   GRAVITY = 0.8,
-  MAX_FALL_SPEED = 8,
-  MAX_FAST_FALL_SPEED = 10,
+  MAX_FALL_SPEED = 12,
+  MAX_FAST_FALL_SPEED = 16,
   JUMP_SPEED = -9,
   JUMP_DEC_SPEED = 0.3,
   WALK_ACC_SPEED = 1,
@@ -59,4 +59,7 @@ const
   DOWN = 5,
   DOWN_LEFT = 6,
   LEFT = 7,
-  UP_LEFT = 8
+  UP_LEFT = 8,
+  //math constants
+  SQRT1_5 = 1 / Math.sqrt(5),
+  SQRT1_2 = Math.SQRT1_2

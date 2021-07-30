@@ -29,7 +29,6 @@ class Player {
     this.dashEnd = false;
     this.jumpHeld = false;
     this.bothHeld = false;
-    this.prevDir = RIGHT;
     this.height = 51.9;
     this.width = 35;
     this.center = 17.5;
@@ -75,20 +74,20 @@ class Player {
     player.pos.y = entrance.y - player.height;
     player.respawn.x = entrance.x;
     player.respawn.y = entrance.y;
-    //keysPressed.ArrowUp = false,
-    //keysPressed.ArrowRight = false,
-    //keysPressed.ArrowDown = false,
-    //keysPressed.ArrowLeft = false,
-    keysPressed.z = false,
-      //keysPressed.x = false,
-      keysPressed.c = false,
-      //keysPressed.w = false,
-      //keysPressed.d = false,
-      //keysPressed.s = false,
-      //keysPressed.a = false,
-      keysPressed.j = false,
-      //keysPressed.k = false,
-      keysPressed.l = false
+    //keysPressed.ArrowUp = false;
+    //keysPressed.ArrowRight = false;
+    //keysPressed.ArrowDown = false;
+    //keysPressed.ArrowLeft = false;
+    keysPressed.z = false;
+    //keysPressed.x = false;
+    keysPressed.c = false;
+    //keysPressed.w = false;
+    //keysPressed.d = false;
+    //keysPressed.s = false;
+    //keysPressed.a = false;
+    keysPressed.j = false;
+    //keysPressed.k = false;
+    keysPressed.l = false;
   }
 
   runHeight() {
@@ -118,8 +117,8 @@ class Player {
       //frameCount = 0;
       return;
     }
-    let onGround = map.level.map[floor(this.pos.x / BLOCK_SIZE)]?.[round(this.pos.y + this.height) / BLOCK_SIZE] === 1 || map.level.map[ceil(this.pos.x / BLOCK_SIZE)]?.[round(this.pos.y + this.height) / BLOCK_SIZE] === 1;
-    let capXOff = this.prevDir === RIGHT ? this.cap.xOff : 2 * this.hitbox.xOff + this.hitbox.width - this.cap.xOff - this.cap.width - 0.7;
+    let onGround = map.level.map[floor((this.hitbox.x) / BLOCK_SIZE)]?.[round(this.hitbox.y + this.hitbox.height) / BLOCK_SIZE] === 1 || map.level.map[floor((this.hitbox.x + this.hitbox.width) / BLOCK_SIZE)]?.[round(this.hitbox.y + this.hitbox.height) / BLOCK_SIZE] === 1;
+    let capXOff = this.state.direction === RIGHT ? this.cap.xOff : 2 * this.hitbox.xOff + this.hitbox.width - this.cap.xOff - this.cap.width - 0.7;
     let prev = {
       x: this.pos.x + this.hitbox.xOff,
       y: this.pos.y + this.hitbox.yOff,
@@ -127,7 +126,8 @@ class Player {
       height: this.hitbox.height
     }
     let prevCap = {
-      x: this.pos.x + capXOff + (this.prevDir === RIGHT ? -5 : 5),
+      direction: this.cap.direction,
+      x: this.pos.x + capXOff + (this.state.direction === RIGHT ? -5 : 5),
       y: this.pos.y + this.cap.yOff,
       width: this.cap.width,
       height: this.cap.height
@@ -153,8 +153,7 @@ class Player {
         this.state.fall = PLAYER_FALL;
       }
     }
-    if (this.state.direction !== this.prevDir) this.prevDir = this.state.direction;
-    if (this.state.walk !== PLAYER_DASH) {
+    if (this.state.walk !== PLAYER_DASH && !this.dashEnd) {
       if ((keysPressed.d || keysPressed.ArrowRight) && (keysPressed.a || keysPressed.ArrowLeft) && !this.bothHeld) {
         if (this.state.direction === RIGHT) {
           this.state.walk = PLAYER_WALK;
@@ -227,6 +226,7 @@ class Player {
           this.acc.y = 0;
         } else {
           this.state.fall = PLAYER_FALL;
+          this.acc.y = GRAVITY;
         }
         break;
       case PLAYER_FALL:
@@ -273,6 +273,7 @@ class Player {
         this.acc.x = 0;
         if (abs(this.vel.x) <= 1) {
           this.vel.x = 0;
+          this.dashEnd = false;
         } else if (this.dashEnd) {
           this.vel.x *= 0.65
         } else if (onGround) {
@@ -285,9 +286,9 @@ class Player {
         this.acc.x = 0;
         if (abs(sign * this.vel.x - WALK_SPEED) <= 1) {
           this.vel.x = sign * WALK_SPEED;
+          this.dashEnd = false;
         } else if (this.dashEnd) {
           this.vel.x = (this.vel.x - sign * WALK_SPEED) * 0.2 + sign * WALK_SPEED;
-          this.dashEnd = false;
         } else if (onGround) {
           this.vel.x = (this.vel.x - sign * WALK_SPEED) * GROUND_FRICTION + sign * WALK_SPEED;
         } else {
@@ -338,7 +339,7 @@ class Player {
           this.changeAnimation(IDLE_ANIMATION, 35, 51.8, 4.2, 22.4, 26.6, 29.4, 0, 2.8, 35, 22.4, -8.4);
           break;
         case LEANING_WALK_ANIMATION:
-          this.changeAnimation(WALK_ANIMATION, 35, 51.8, 4.2, 19.6 + this.runHeight(), 26.6, 29.4, 0, this.runHeight(), 35, 22.4, -8.4);
+          this.changeAnimation(WALK_ANIMATION, 35, 51.8, 4.2, 12.4, 26.6, 29.4, 0, 2.8, 35, 22.4, -8.4);
           break;
       }
     } else {
@@ -347,7 +348,7 @@ class Player {
           this.changeAnimation(LEANING_IDLE_ANIMATION, 46.2, 43.4, 2.8, 11.2, 23.8, 32.2, 23.8, 2.8, 22.4, 35, 8.4);
           break;
         case WALK_ANIMATION:
-          this.changeAnimation(LEANING_IDLE_ANIMATION, 46.2, 43.4, 2.8, 8.4 + this.runHeight(), 23.8, 32.2, 23.8, this.runHeight(), 22.4, 35, 8.4);
+          this.changeAnimation(LEANING_IDLE_ANIMATION, 46.2, 43.4, 2.8, 11.2, 23.8, 32.2, 23.8, 2.8, 22.4, 35, 8.4);
           break;
       }
     }
@@ -360,6 +361,7 @@ class Player {
 
     //object collision detection
     let checkRadius = sqrDist(this.hitbox.x, this.hitbox.y, prev.x, prev.y) + 3200;
+    let resetX = false;
     for (let object of map.objects) {
       if (sqrDist(this.hitbox.x, this.hitbox.y, object.pos.x, object.pos.y) <= checkRadius) {
         let checkCap = true;
@@ -369,31 +371,68 @@ class Player {
           if (this.cap.direction !== DOWN) checkCap = false;
         }, (x, y, w, h) => {
           this.pos.y = y + h - this.hitbox.yOff;
-          this.vel.y = 0;
           if (this.cap.direction === DOWN) checkCap = false;
         }, (x, y, w, h) => {
           this.pos.x = x - this.hitbox.width - this.hitbox.xOff;
-          this.vel.x = 0;
+          this.state.walk = this.state.walk === PLAYER_STILL ? PLAYER_STILL : PLAYER_WALK;
+          this.dashEnd = false;
+          resetX = true;
           if (this.cap.direction === LEFT) checkCap = false;
         }, (x, y, w, h) => {
           this.pos.x = x + w - this.hitbox.xOff;
-          this.vel.x = 0;
+          this.state.walk = this.state.walk === PLAYER_STILL ? PLAYER_STILL : PLAYER_WALK;
+          this.dashEnd = false;
+          resetX = true;
           if (this.cap.direction === RIGHT) checkCap = false;
         });
         if (checkCap) object.checkCollision?.(this, prevCap, 'cap', (x, y, w, h) => {
           this.pos.y = y - this.cap.height - this.cap.yOff;
-          //this.vel.y = 0;
+          switch (this.cap.direction) {
+
+          }
         }, (x, y, w, h) => {
           this.pos.y = y + h - this.cap.yOff;
-          //this.vel.y = 0;
+          switch (this.cap.direction) {
+
+          }
         }, (x, y, w, h) => {
           this.pos.x = x - this.cap.width - capXOff;
-          this.vel.x = -max(20, 2 * abs(this.vel.x));
+          switch (this.cap.direction) {
+            case RIGHT:
+              if (prevCap.direction === RIGHT) this.vel.x = -max(20, 2 * abs(this.vel.x));
+              else {
+                let multX = this.cap.x + this.cap.width - x < 6 ? 3 * SQRT1_5 : 1.5 * SQRT1_5;
+                let multY = 4 * SQRT1_5 - multX;
+                this.vel.x = -multX * max(12, abs(this.vel.x));
+                this.vel.y = -multY * max(12, abs(this.vel.x) + this.vel.y / 2);
+              }
+              break;
+            case UP:
+            case DOWN:
+              this.vel.x = -max(12, abs(this.vel.x));
+          }
           this.state.walk = this.state.walk === PLAYER_STILL ? PLAYER_STILL : PLAYER_WALK;
+          this.dashEnd = false;
+          resetX = false;
         }, (x, y, w, h) => {
           this.pos.x = x + w - capXOff;
-          this.vel.x = max(20, 2 * abs(this.vel.x));
+          switch (this.cap.direction) {
+            case LEFT:
+              if (prevCap.direction === LEFT) this.vel.x = max(20, 2 * abs(this.vel.x));
+              else {
+                let multX = x + w - this.cap.x < 6 ? 3 * SQRT1_5 : 1.5 * SQRT1_5;
+                let multY = 4 * SQRT1_5 - multX;
+                this.vel.x = multX * max(12, abs(this.vel.x));
+                this.vel.y = -multY * max(12, abs(this.vel.x) + this.vel.y / 2);
+              }
+              break;
+            case UP:
+            case DOWN:
+              this.vel.x = max(12, abs(this.vel.x));
+          }
           this.state.walk = this.state.walk === PLAYER_STILL ? PLAYER_STILL : PLAYER_WALK;
+          this.dashEnd = false;
+          resetX = false;
         });
         capXOff = this.state.direction === RIGHT ? this.cap.xOff : 2 * this.hitbox.xOff + this.hitbox.width - this.cap.xOff - this.cap.width - 0.7;
         this.hitbox.x = this.pos.x + this.hitbox.xOff;
@@ -403,7 +442,7 @@ class Player {
       }
       if (gamestate == GAME_DEAD) break;
     }
-    if (round((this.hitbox.y + this.hitbox.height) * 10) / 10 > 775) console.log(prev, this.hitbox), noLoop();
+    if (resetX) this.vel.x = 0;
   }
 
   draw() {
@@ -423,26 +462,12 @@ class Player {
         id = floor(this.counter.animation.walk / 3);
         this.sprites.x = animations.player.walk.x[id];
         this.sprites.y = animations.player.walk.y[id];
-        if ([2, 5, 14, 17].includes(this.counter.animation.walk)) {
-          this.hitbox.yOff -= 1.4;
-          this.cap.yOff -= 1.4;
-        } else if (this.counter.animation.walk % 3 === 2) {
-          this.hitbox.yOff += 1.4;
-          this.cap.yOff += 1.4;
-        }
         break;
       case LEANING_WALK_ANIMATION:
         this.counter.animation.walk = (this.counter.animation.walk + 1) % (animations.player.leaningWalk.length * 3);
         id = floor(this.counter.animation.walk / 3);
         this.sprites.x = animations.player.leaningWalk.x[id];
         this.sprites.y = animations.player.leaningWalk.y[id];
-        if ([2, 5, 14, 17].includes(this.counter.animation.walk)) {
-          this.hitbox.yOff -= 1.4;
-          this.cap.yOff -= 1.4;
-        } else if (this.counter.animation.walk % 3 === 2) {
-          this.hitbox.yOff += 1.4;
-          this.cap.yOff += 1.4;
-        }
         break;
     }
     if (this.state.direction === LEFT) {
@@ -453,8 +478,8 @@ class Player {
     image(this.sprites.image, this.pos.x, this.pos.y, this.width, this.height, this.sprites.x, this.sprites.y, this.sprites.width, this.sprites.height);
     resetMatrix();
     fill(0, 255, 0, 80)
-    rect(this.cap.x, this.cap.y, this.cap.width, this.cap.height)
-    rect(this.hitbox.x, this.hitbox.y, this.hitbox.width, this.hitbox.height)
+    //rect(this.cap.x, this.cap.y, this.cap.width, this.cap.height)
+    //rect(this.hitbox.x, this.hitbox.y, this.hitbox.width, this.hitbox.height)
     //rect(this.pos.x + (this.state.direction === RIGHT ? 0 : -this.width + 2 * this.hitbox.xOff + this.hitbox.width), this.pos.y, this.width, this.height)
   }
 }
