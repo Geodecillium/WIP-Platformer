@@ -388,13 +388,36 @@ class Player {
         if (checkCap) object.checkCollision?.(this, prevCap, 'cap', (x, y, w, h) => {
           this.pos.y = y - this.cap.height - this.cap.yOff;
           switch (this.cap.direction) {
-
-          }
-        }, (x, y, w, h) => {
-          this.pos.y = y + h - this.cap.yOff;
-          switch (this.cap.direction) {
-
-          }
+                case DOWN:
+                  if (prevCap.direction === DOWN) this.vel.y = -max(20, 2 * abs(this.vel.y));
+                  else {
+                    let multY = this.cap.y + this.cap.height - y < 6 ? 3 * SQRT1_5 : 1.5 * SQRT1_5;
+                    let multX = 4 * SQRT1_5 - multY;
+                    this.vel.y = -multY * max(12, abs(this.vel.y));
+                    this.vel.x = -multX * max(12, abs(this.vel.y) + this.vel.x / 2);
+                  }
+                  break;
+                case LEFT:
+                case RIGHT:
+                  this.vel.y = -max(12, abs(this.vel.y));
+              }
+            }, (x, y, w, h) => {
+              this.pos.y = y + h - this.cap.yOff;
+              switch (this.cap.direction) {
+                case UP:
+                  if (prevCap.direction === UP) this.vel.y = max(20, 2 * abs(this.vel.y));
+                  else {
+                    let multY = this.cap.y + this.cap.height - y < 6 ? 3 * SQRT1_5 : 1.5 * SQRT1_5;
+                    let multX = 4 * SQRT1_5 - multY;
+                    this.vel.y = multY * max(12, abs(this.vel.y));
+                    this.vel.x = -multX * max(12, abs(this.vel.y) + this.vel.x / 2);
+                  }
+                  break;
+                case LEFT:
+                case RIGHT:
+                  this.vel.y = -max(12, abs(this.vel.y));
+              }
+          
         }, (x, y, w, h) => {
           this.pos.x = x - this.cap.width - capXOff;
           switch (this.cap.direction) {
