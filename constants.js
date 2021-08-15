@@ -24,9 +24,8 @@ const
   LEANING_WALK_ANIMATION = 4,
   //  walk
   PLAYER_STILL = 1,
-  PLAYER_WALK_ACC = 2,
-  PLAYER_WALK = 3,
-  PLAYER_DASH = 4,
+  PLAYER_WALK = 2,
+  PLAYER_DASH = 3,
   //  fall
   PLAYER_GROUNDED = 1,
   PLAYER_FALL = 2,

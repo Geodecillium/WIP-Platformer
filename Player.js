@@ -389,7 +389,7 @@ class Player {
           this.pos.y = y - this.cap.height - this.cap.yOff;
           switch (this.cap.direction) {
                 case DOWN:
-                  if (prevCap.direction === DOWN) this.vel.y = -max(20, 2 * abs(this.vel.y));
+                  if (prevCap.direction === DOWN) this.vel.y = -max(12, 1.25 * abs(this.vel.y));
                   else {
                     let multY = this.cap.y + this.cap.height - y < 6 ? 3 * SQRT1_5 : 1.5 * SQRT1_5;
                     let multX = 4 * SQRT1_5 - multY;
@@ -399,7 +399,7 @@ class Player {
                   break;
                 case LEFT:
                 case RIGHT:
-                  this.vel.y = -max(12, abs(this.vel.y));
+                  this.vel.y = -max(9, abs(this.vel.y));
               }
             }, (x, y, w, h) => {
               this.pos.y = y + h - this.cap.yOff;
