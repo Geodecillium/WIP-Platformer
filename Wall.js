@@ -43,7 +43,8 @@ class Wall {
   }
 
   draw() {
-    this.collided ? fill(0, 255, 0) : fill(128);
+    //this.collided ? fill(0, 255, 0) : fill(128);
+    fill(128);
     let x = this.pos.x - map.camera.x;
     let y = this.pos.y - map.camera.y;
     square(x, y, BLOCK_SIZE);

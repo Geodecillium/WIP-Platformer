@@ -146,8 +146,8 @@ class Player {
       this.jumpHeld = true;
     } else {
       this.jumpHeld = false;
-      if (this.state.fall === PLAYER_JUMP) {
-        this.vel.y += -0.04 * this.counter.jump ** 2 + 0.42 * this.counter.jump - 0.6;
+      if (this.state.fall === PLAYER_JUMP && this.counter.jump >= 5) {
+        this.vel.y += -0.034 * this.counter.jump ** 2 - 0.1 * this.counter.jump + 4.37;
         //decreases speed depending on when you let go of jump to get the best jump curves
         this.counter.jump = 0;
         this.state.fall = PLAYER_FALL;
@@ -288,7 +288,7 @@ class Player {
           this.vel.x = sign * WALK_SPEED;
           this.dashEnd = false;
         } else if (this.dashEnd) {
-          this.vel.x = (this.vel.x - sign * WALK_SPEED) * 0.2 + sign * WALK_SPEED;
+          this.vel.x = (this.vel.x - sign * WALK_SPEED) * DASH_END_FRICTION + sign * WALK_SPEED;
         } else if (onGround) {
           this.vel.x = (this.vel.x - sign * WALK_SPEED) * GROUND_FRICTION + sign * WALK_SPEED;
         } else {
@@ -481,14 +481,14 @@ class Player {
         break;
       case WALK_ANIMATION:
         //increment before so we skip the first frame
-        this.counter.animation.walk = (this.counter.animation.walk + 1) % (animations.player.leaningWalk.length * 3);
-        id = floor(this.counter.animation.walk / 3);
+        this.counter.animation.walk = (this.counter.animation.walk + 1) % (animations.player.leaningWalk.length * 4);
+        id = floor(this.counter.animation.walk / 4);
         this.sprites.x = animations.player.walk.x[id];
         this.sprites.y = animations.player.walk.y[id];
         break;
       case LEANING_WALK_ANIMATION:
-        this.counter.animation.walk = (this.counter.animation.walk + 1) % (animations.player.leaningWalk.length * 3);
-        id = floor(this.counter.animation.walk / 3);
+        this.counter.animation.walk = (this.counter.animation.walk + 1) % (animations.player.leaningWalk.length * 4);
+        id = floor(this.counter.animation.walk / 4);
         this.sprites.x = animations.player.leaningWalk.x[id];
         this.sprites.y = animations.player.leaningWalk.y[id];
         break;
